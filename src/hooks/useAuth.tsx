@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import authService from '@/services/auth.service';
-import { LoginCredentials, UserProfile } from '@/types';
+import { LoginCredentials, UserProfile, RegisterCredentials } from '@/types';
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -11,9 +11,11 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
+  register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => void;
   error: string | null;
   isLoggingIn: boolean;
+  isRegistering: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,6 +62,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await loginMutation.mutateAsync(credentials);
   };
 
+  const registerMutation = useMutation({
+    mutationFn: authService.register,
+    onSuccess: (data) => {
+      // Mock log in the registered user since dummyjson doesn't persist it
+      const mockToken = 'mock_token_' + Math.random().toString(36).substring(2);
+      const profile: UserProfile = {
+        id: data.id || 999,
+        username: data.username || 'newuser',
+        email: data.email || 'newuser@example.com',
+        firstName: data.firstName || 'New',
+        lastName: data.lastName || 'User',
+        gender: data.gender || 'unknown',
+        image: data.image || 'https://dummyjson.com/icon/emilys/128',
+      };
+      
+      localStorage.setItem('shopilot_token', mockToken);
+      localStorage.setItem('shopilot_user', JSON.stringify(profile));
+      setToken(mockToken);
+      setUser(profile);
+      setError(null);
+      
+      queryClient.clear();
+    },
+    onError: (err: any) => {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    },
+  });
+
+  const register = async (credentials: RegisterCredentials) => {
+    setError(null);
+    await registerMutation.mutateAsync(credentials);
+  };
+
   const logout = () => {
     localStorage.removeItem('shopilot_token');
     localStorage.removeItem('shopilot_user');
@@ -78,9 +113,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!token,
         isLoading,
         login,
+        register,
         logout,
         error,
         isLoggingIn: loginMutation.isPending,
+        isRegistering: registerMutation.isPending,
       }}
     >
       {children}

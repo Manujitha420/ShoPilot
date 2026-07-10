@@ -4,6 +4,15 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface RegisterCredentials {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  password?: string;
+}
+
+
 export interface UserProfile {
   id: number;
   username: string;
