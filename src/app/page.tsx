@@ -141,9 +141,13 @@ export default function HomePage() {
               />
               <button
                 type="submit"
-                className="bg-[#3b42c4] hover:bg-[#2d33a6] text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-sm text-sm shrink-0 cursor-pointer"
+                className="group relative bg-[#3b42c4] text-white font-bold px-6 py-2.5 rounded-xl overflow-hidden cursor-pointer border border-[#3b42c4] shadow-sm text-sm shrink-0 transition-all duration-300"
               >
-                Search
+                {/* Slide background overlay from bottom to top */}
+                <span className="absolute inset-x-0 bottom-0 h-0 bg-white transition-all duration-300 ease-out group-hover:h-full z-0" />
+                <span className="relative z-10 transition-colors duration-600 group-hover:text-[#3b42c4]">
+                  Search
+                </span>
               </button>
             </div>
           </form>
@@ -152,16 +156,24 @@ export default function HomePage() {
           <div className="flex flex-wrap justify-center items-center gap-4 mt-8">
             <Link
               href="/products"
-              className="bg-[#3b42c4] hover:bg-[#2d33a6] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-sm text-sm"
+              className="group relative bg-[#3b42c4] text-white font-bold py-3 px-6 rounded-xl overflow-hidden cursor-pointer border border-[#3b42c4] shadow-sm text-sm transition-all duration-300"
             >
-              Start Shopping
+              {/* Slide background overlay from bottom to top */}
+              <span className="absolute inset-x-0 bottom-0 h-0 bg-white transition-all duration-300 ease-out group-hover:h-full z-0" />
+              <span className="relative z-10 transition-colors duration-600 group-hover:text-[#3b42c4]">
+                Start Shopping
+              </span>
             </Link>
             <Link
               href="/chat"
-              className="bg-white hover:bg-slate-50 text-[#3b42c4] border border-slate-200 font-bold py-3 px-6 rounded-xl transition-all text-sm flex items-center gap-2"
+              className="group relative bg-white text-[#3b42c4] border border-slate-200 font-bold py-3 px-6 rounded-xl overflow-hidden cursor-pointer shadow-sm text-sm transition-all duration-300 flex items-center gap-2"
             >
-              <Sparkles className="w-4 h-4" />
-              <span>Try AI Assistant</span>
+              {/* Slide background overlay from bottom to top */}
+              <span className="absolute inset-x-0 bottom-0 h-0 bg-slate-100 transition-all duration-300 ease-out group-hover:h-full z-0" />
+              <span className="relative z-10 flex items-center gap-2 transition-colors duration-600">
+                <Sparkles className="w-4 h-4" />
+                <span>Try AI Assistant</span>
+              </span>
             </Link>
           </div>
         </div>
@@ -198,14 +210,21 @@ export default function HomePage() {
                 href="/products?category=smartphones"
                 className="md:row-span-2 relative overflow-hidden rounded-[24px] bg-slate-50 h-[320px] md:h-full min-h-[360px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
               >
-                <img
-                  src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80"
-                  alt="Smartphones"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                <div className="absolute inset-0 z-0">
+                  <img
+                    src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80"
+                    alt="Smartphones"
+                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
+                  />
+                  <img
+                    src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80"
+                    alt="Smartphones Hover"
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
+                  />
+                </div>
                 {/* Light overlay at the bottom */}
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/20 to-transparent z-0" />
-                <div className="absolute bottom-6 left-6 z-10 flex flex-col items-start gap-1">
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/20 to-transparent z-10" />
+                <div className="absolute bottom-6 left-6 z-20 flex flex-col items-start gap-1">
                   <span className="bg-[#eef2ff] text-[#3b42c4] font-extrabold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-md">
                     Tech Hub
                   </span>
@@ -220,13 +239,20 @@ export default function HomePage() {
                 href="/products?category=laptops"
                 className="md:col-span-2 relative overflow-hidden rounded-[24px] bg-slate-50 h-[220px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
               >
-                <img
-                  src="https://images.unsplash.com/photo-1496181130204-7552cc145cdb?w=600&auto=format&fit=crop&q=80"
-                  alt="Laptops"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-0" />
-                <div className="absolute bottom-6 left-6 z-10">
+                <div className="absolute inset-0 z-0">
+                  <img
+                    src="https://images.unsplash.com/photo-1496181130204-7552cc145cdb?w=600&auto=format&fit=crop&q=80"
+                    alt="Laptops"
+                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
+                  />
+                  <img
+                    src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&auto=format&fit=crop&q=80"
+                    alt="Laptops Hover"
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-10" />
+                <div className="absolute bottom-6 left-6 z-20">
                   <span className="text-xl font-bold text-slate-800">
                     Laptops
                   </span>
@@ -238,13 +264,20 @@ export default function HomePage() {
                 href="/products?category=furniture"
                 className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[220px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
               >
-                <img
-                  src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&auto=format&fit=crop&q=80"
-                  alt="Furniture"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-0" />
-                <div className="absolute bottom-6 left-6 z-10">
+                <div className="absolute inset-0 z-0">
+                  <img
+                    src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&auto=format&fit=crop&q=80"
+                    alt="Furniture"
+                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
+                  />
+                  <img
+                    src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=600&auto=format&fit=crop&q=80"
+                    alt="Furniture Hover"
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-10" />
+                <div className="absolute bottom-6 left-6 z-20">
                   <span className="text-xl font-bold text-slate-800">
                     Furniture
                   </span>
@@ -256,13 +289,20 @@ export default function HomePage() {
                 href="/products?category=beauty"
                 className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[220px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
               >
-                <img
-                  src="https://images.unsplash.com/photo-1608248597481-496100c80836?w=600&auto=format&fit=crop&q=80"
-                  alt="Beauty"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-0" />
-                <div className="absolute bottom-6 left-6 z-10">
+                <div className="absolute inset-0 z-0">
+                  <img
+                    src="https://images.unsplash.com/photo-1608248597481-496100c80836?w=600&auto=format&fit=crop&q=80"
+                    alt="Beauty"
+                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
+                  />
+                  <img
+                    src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80"
+                    alt="Beauty Hover"
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-10" />
+                <div className="absolute bottom-6 left-6 z-20">
                   <span className="text-xl font-bold text-slate-800">
                     Beauty
                   </span>
@@ -277,13 +317,20 @@ export default function HomePage() {
                 href="/products?category=groceries"
                 className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[180px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
               >
-                <img
-                  src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80"
-                  alt="Groceries"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-0" />
-                <div className="absolute bottom-6 left-6 z-10">
+                <div className="absolute inset-0 z-0">
+                  <img
+                    src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80"
+                    alt="Groceries"
+                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
+                  />
+                  <img
+                    src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&auto=format&fit=crop&q=80"
+                    alt="Groceries Hover"
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-10" />
+                <div className="absolute bottom-6 left-6 z-20">
                   <span className="text-xl font-bold text-slate-800">
                     Groceries
                   </span>
@@ -295,13 +342,20 @@ export default function HomePage() {
                 href="/products?category=fragrances"
                 className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[180px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
               >
-                <img
-                  src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80"
-                  alt="Fragrances"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-0" />
-                <div className="absolute bottom-6 left-6 z-10">
+                <div className="absolute inset-0 z-0">
+                  <img
+                    src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80"
+                    alt="Fragrances"
+                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
+                  />
+                  <img
+                    src="https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=600&auto=format&fit=crop&q=80"
+                    alt="Fragrances Hover"
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-10" />
+                <div className="absolute bottom-6 left-6 z-20">
                   <span className="text-xl font-bold text-slate-800">
                     Fragrances
                   </span>
