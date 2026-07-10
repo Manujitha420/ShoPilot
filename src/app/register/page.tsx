@@ -269,12 +269,12 @@ function RegisterFormContent() {
             <span className="absolute inset-x-0 bottom-0 h-0 bg-white transition-all duration-300 ease-out group-hover:h-full z-0" />
             
             {/* Content */}
-            <span className="relative z-10 flex items-center gap-2 transition-colors duration-300 group-hover:text-black">
+            <span className="relative z-10 flex items-center gap-2 transition-colors duration-600 group-hover:text-black">
               {isRegistering ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  <span>Create Account</span>
+                  <span>CREATE ACCOUNT</span>
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </>
               )}
