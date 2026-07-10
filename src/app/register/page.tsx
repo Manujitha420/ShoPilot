@@ -111,63 +111,78 @@ function RegisterFormContent() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-2">
-              Full Name
-            </label>
             <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
               <input
                 type="text"
+                id="fullName"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
-                className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-12 pr-4 py-3 outline-none transition-all text-sm placeholder-slate-400 font-medium"
+                placeholder=" "
+                className="peer w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-12 pr-4 pt-6 pb-2.5 outline-none transition-all text-sm font-semibold"
               />
+              <label
+                htmlFor="fullName"
+                className="absolute left-12 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold transition-all duration-200 pointer-events-none origin-[0_0]
+                           peer-focus:-translate-y-[18px] peer-focus:scale-75 peer-focus:text-[#3b42c4] peer-focus:font-bold
+                           peer-[:not(:placeholder-shown)]:-translate-y-[18px] peer-[:not(:placeholder-shown)]:scale-75"
+              >
+                Full Name
+              </label>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-2">
-              Email Address
-            </label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
               <input
                 type="email"
+                id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
-                className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-12 pr-4 py-3 outline-none transition-all text-sm placeholder-slate-400 font-medium"
+                placeholder=" "
+                className="peer w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-12 pr-4 pt-6 pb-2.5 outline-none transition-all text-sm font-semibold"
               />
+              <label
+                htmlFor="email"
+                className="absolute left-12 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold transition-all duration-200 pointer-events-none origin-[0_0]
+                           peer-focus:-translate-y-[18px] peer-focus:scale-75 peer-focus:text-[#3b42c4] peer-focus:font-bold
+                           peer-[:not(:placeholder-shown)]:-translate-y-[18px] peer-[:not(:placeholder-shown)]:scale-75"
+              >
+                Email Address
+              </label>
             </div>
           </div>
 
           {/* Password & Confirm Password (2 Columns) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-2">
-                Password
-              </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
                 <input
                   type="password"
+                  id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-12 pr-4 py-3 outline-none transition-all text-sm placeholder-slate-400 font-medium"
+                  placeholder=" "
+                  className="peer w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-12 pr-4 pt-6 pb-2.5 outline-none transition-all text-sm font-semibold"
                 />
+                <label
+                  htmlFor="password"
+                  className="absolute left-12 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold transition-all duration-200 pointer-events-none origin-[0_0]
+                             peer-focus:-translate-y-[18px] peer-focus:scale-75 peer-focus:text-[#3b42c4] peer-focus:font-bold
+                             peer-[:not(:placeholder-shown)]:-translate-y-[18px] peer-[:not(:placeholder-shown)]:scale-75"
+                >
+                  Password
+                </label>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-2">
-                Confirm Password
-              </label>
               <div className="relative">
                 {/* Custom Reset-Lock SVG Icon */}
                 <svg
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -181,54 +196,89 @@ function RegisterFormContent() {
                 </svg>
                 <input
                   type="password"
+                  id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-12 pr-4 py-3 outline-none transition-all text-sm placeholder-slate-400 font-medium"
+                  placeholder=" "
+                  className="peer w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-12 pr-4 pt-6 pb-2.5 outline-none transition-all text-sm font-semibold"
                 />
+                <label
+                  htmlFor="confirmPassword"
+                  className="absolute left-12 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold transition-all duration-200 pointer-events-none origin-[0_0]
+                             peer-focus:-translate-y-[18px] peer-focus:scale-75 peer-focus:text-[#3b42c4] peer-focus:font-bold
+                             peer-[:not(:placeholder-shown)]:-translate-y-[18px] peer-[:not(:placeholder-shown)]:scale-75"
+                >
+                  Confirm Password
+                </label>
               </div>
             </div>
           </div>
 
-          {/* Agreement Checkbox */}
-          <div className="flex items-start">
-            <input
-              id="agree-to-terms"
-              type="checkbox"
-              checked={agreeToTerms}
-              onChange={(e) => setAgreeToTerms(e.target.checked)}
-              className="h-4.5 w-4.5 text-[#3b42c4] focus:ring-[#3b42c4] border-slate-300 rounded cursor-pointer mt-0.5"
-            />
-            <label
-              htmlFor="agree-to-terms"
-              className="ml-2 block text-sm font-semibold text-slate-500 cursor-pointer select-none leading-normal"
-            >
+          {/* Agreement Checkbox with expanding outline cool transition */}
+          <div
+            className="flex items-start select-none cursor-pointer group"
+            onClick={() => setAgreeToTerms(!agreeToTerms)}
+          >
+            <div className="relative flex items-center justify-center w-6 h-6 shrink-0 mt-0.5">
+              {/* Expanding outline background element */}
+              <div className={`absolute inset-0 rounded-lg bg-[#3b42c4]/15 transition-all duration-500 ease-out transform
+                ${agreeToTerms ? 'scale-[1.6] opacity-100' : 'scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-40'}`}
+              />
+              {/* Checkbox box */}
+              <div className={`relative w-4.5 h-4.5 rounded border transition-all duration-300 flex items-center justify-center z-10
+                ${agreeToTerms
+                  ? 'border-[#3b42c4] bg-[#3b42c4]'
+                  : 'border-slate-300 bg-white group-hover:border-slate-400'
+                }`}
+              >
+                {agreeToTerms && (
+                  <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="17 5 8 14 3 9" />
+                  </svg>
+                )}
+              </div>
+            </div>
+            <span className="ml-3 text-sm font-semibold text-slate-500 group-hover:text-slate-600 transition-colors leading-normal select-none">
               I agree to the{' '}
-              <Link href="/terms" className="text-[#3b42c4] hover:underline font-bold">
+              <Link
+                href="/terms"
+                className="text-[#3b42c4] hover:underline font-bold"
+                onClick={(e) => e.stopPropagation()}
+              >
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link href="/privacy" className="text-[#3b42c4] hover:underline font-bold">
+              <Link
+                href="/privacy"
+                className="text-[#3b42c4] hover:underline font-bold"
+                onClick={(e) => e.stopPropagation()}
+              >
                 Privacy Policy
               </Link>
               .
-            </label>
+            </span>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit Button with slide-up hover fill transition */}
           <button
             type="submit"
             disabled={isRegistering}
-            className="w-full bg-[#3b42c4] hover:bg-[#2d33a6] text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm text-sm disabled:opacity-50 cursor-pointer"
+            className="group relative w-full bg-black text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden cursor-pointer border border-black shadow-sm text-sm"
           >
-            {isRegistering ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <>
-                <span>Create Account</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
+            {/* Slide background overlay from bottom to top */}
+            <span className="absolute inset-x-0 bottom-0 h-0 bg-white transition-all duration-300 ease-out group-hover:h-full z-0" />
+            
+            {/* Content */}
+            <span className="relative z-10 flex items-center gap-2 transition-colors duration-300 group-hover:text-black">
+              {isRegistering ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  <span>Create Account</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </>
+              )}
+            </span>
           </button>
         </form>
 

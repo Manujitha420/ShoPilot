@@ -86,45 +86,57 @@ function LoginFormContent() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-2">
-              Email or Username
-            </label>
             <div className="relative">
               <input
                 type="text"
+                id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="name@company.com"
-                className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-4 pr-12 py-3 outline-none transition-all text-sm placeholder-slate-400 font-medium"
+                placeholder=" "
+                className="peer w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-4 pr-12 pt-6 pb-2.5 outline-none transition-all text-sm font-semibold"
               />
-              <User className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <label
+                htmlFor="username"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold transition-all duration-200 pointer-events-none origin-[0_0]
+                           peer-focus:-translate-y-[18px] peer-focus:scale-75 peer-focus:text-[#3b42c4] peer-focus:font-bold
+                           peer-[:not(:placeholder-shown)]:-translate-y-[18px] peer-[:not(:placeholder-shown)]:scale-75"
+              >
+                Email Address
+              </label>
+              <User className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
             </div>
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-bold text-slate-500">
-                Password
-              </label>
-              <Link
-                href="/forgot-password"
-                className="text-xs font-semibold text-[#3b42c4] hover:underline"
-              >
-                Forgot?
-              </Link>
-            </div>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
+                id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-4 pr-12 py-3 outline-none transition-all text-sm placeholder-slate-400 font-medium"
+                placeholder=" "
+                className="peer w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-[#3b42c4] focus:ring-1 focus:ring-[#3b42c4] text-slate-800 rounded-xl pl-4 pr-24 pt-6 pb-2.5 outline-none transition-all text-sm font-semibold"
               />
+              <label
+                htmlFor="password"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold transition-all duration-200 pointer-events-none origin-[0_0]
+                           peer-focus:-translate-y-[18px] peer-focus:scale-75 peer-focus:text-[#3b42c4] peer-focus:font-bold
+                           peer-[:not(:placeholder-shown)]:-translate-y-[18px] peer-[:not(:placeholder-shown)]:scale-75"
+              >
+                Password
+              </label>
+              <div className="absolute right-12 top-1/2 -translate-y-1/2 pr-1.5 flex items-center z-20">
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-bold text-[#3b42c4] hover:underline"
+                >
+                  Forgot?
+                </Link>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none z-20"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -135,37 +147,55 @@ function LoginFormContent() {
             </div>
           </div>
 
-          {/* Remember Me */}
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="h-4.5 w-4.5 text-[#3b42c4] focus:ring-[#3b42c4] border-slate-300 rounded cursor-pointer"
-            />
-            <label
-              htmlFor="remember-me"
-              className="ml-2 block text-sm font-semibold text-slate-500 cursor-pointer"
-            >
+          {/* Remember Me with expanding outline cool transition */}
+          <div
+            className="flex items-center select-none cursor-pointer group w-fit"
+            onClick={() => setRememberMe(!rememberMe)}
+          >
+            <div className="relative flex items-center justify-center w-6 h-6">
+              {/* Expanding outline background element */}
+              <div className={`absolute inset-0 rounded-lg bg-[#3b42c4]/15 transition-all duration-500 ease-out transform
+                ${rememberMe ? 'scale-[1.6] opacity-100' : 'scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-40'}`}
+              />
+              {/* Checkbox box */}
+              <div className={`relative w-4.5 h-4.5 rounded border transition-all duration-300 flex items-center justify-center z-10
+                ${rememberMe
+                  ? 'border-[#3b42c4] bg-[#3b42c4]'
+                  : 'border-slate-300 bg-white group-hover:border-slate-400'
+                }`}
+              >
+                {rememberMe && (
+                  <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="17 5 8 14 3 9" />
+                  </svg>
+                )}
+              </div>
+            </div>
+            <span className="ml-3 text-sm font-semibold text-slate-500 group-hover:text-slate-600 transition-colors">
               Remember me
-            </label>
+            </span>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit Button with slide-up hover fill transition */}
           <button
             type="submit"
             disabled={isLoggingIn}
-            className="w-full bg-[#3b42c4] hover:bg-[#2d33a6] text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm text-sm disabled:opacity-50 cursor-pointer"
+            className="group relative w-full bg-black text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden cursor-pointer border border-black shadow-sm"
           >
-            {isLoggingIn ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <>
-                <span>Login</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
+            {/* Slide background overlay from bottom to top */}
+            <span className="absolute inset-x-0 bottom-0 h-0 bg-white transition-all duration-300 ease-out group-hover:h-full z-0" />
+
+            {/* Content */}
+            <span className="relative z-10 flex items-center gap-2 transition-colors duration-600 group-hover:text-black">
+              {isLoggingIn ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  <span>LOGIN</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </>
+              )}
+            </span>
           </button>
         </form>
 
@@ -179,17 +209,29 @@ function LoginFormContent() {
           </span>
         </div>
 
-        {/* Social Buttons */}
+        {/* Social Buttons with zoom zoom zoom hover effect */}
         <div className="grid grid-cols-3 gap-3">
           {/* Google */}
           <button
             type="button"
-            className="flex items-center justify-center py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 shadow-sm transition-all cursor-pointer"
+            className="group flex items-center justify-center py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all cursor-pointer"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 transition-transform duration-300 group-hover:scale-120" viewBox="0 0 24 24">
+              <path
+                fill="#4285F4"
+                d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.61c-.29 1.53-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-8.58z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 24c3.24 0 5.97-1.08 7.96-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.08 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.15C3.27 21.35 7.37 24 12 24z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.27 14.24A7.18 7.18 0 0 1 4.9 12c0-.79.13-1.57.37-2.31V6.54H1.29A11.94 11.94 0 0 0 0 12c0 2.05.52 4.02 1.29 5.76l3.98-3.52z"
+              />
               <path
                 fill="#EA4335"
-                d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.34 0-6.05-2.71-6.05-6.05s2.71-6.05 6.05-6.05c1.478 0 2.822.535 3.862 1.417l3.078-3.078C18.91 2.99 15.827 2 12.24 2 6.584 2 2 6.584 2 12.24s4.584 10.24 10.24 10.24c5.795 0 9.828-4.073 9.828-9.982 0-.67-.06-1.3-.17-1.89l-9.658-.323z"
+                d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.96 1.19 15.24 0 12 0 7.37 0 3.27 2.65 1.29 6.54l3.98 3.15c.95-2.85 3.6-4.94 6.73-4.94z"
               />
             </svg>
           </button>
@@ -197,9 +239,9 @@ function LoginFormContent() {
           {/* Facebook */}
           <button
             type="button"
-            className="flex items-center justify-center py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 shadow-sm transition-all cursor-pointer"
+            className="group flex items-center justify-center py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all cursor-pointer"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#1877F2">
+            <svg className="w-6 h-6 transition-transform duration-300 group-hover:scale-120" viewBox="0 0 24 24" fill="#1877F2">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>
           </button>
@@ -207,9 +249,9 @@ function LoginFormContent() {
           {/* Apple */}
           <button
             type="button"
-            className="flex items-center justify-center py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 shadow-sm transition-all cursor-pointer"
+            className="group flex items-center justify-center py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all cursor-pointer"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#000000">
+            <svg className="w-6 h-6 transition-transform duration-300 group-hover:scale-120" viewBox="0 0 24 24" fill="#000000">
               <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.1.09 2.23-.58 2.95-1.39z" />
             </svg>
           </button>
