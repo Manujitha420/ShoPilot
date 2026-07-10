@@ -7,6 +7,7 @@ export interface NvidiaAIParams {
   maxTokens?: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const callNvidiaAI = async (params: NvidiaAIParams): Promise<any> => {
   const apiKey = process.env.NVIDIA_NIM_API_KEY;
   if (!apiKey) {
@@ -26,7 +27,7 @@ export const callNvidiaAI = async (params: NvidiaAIParams): Promise<any> => {
     'meta/llama-3.1-8b-instruct',
   ];
 
-  let lastError: any = null;
+  let lastError: Error | null = null;
 
   for (const modelName of modelsToTry) {
     try {
@@ -49,12 +50,13 @@ export const callNvidiaAI = async (params: NvidiaAIParams): Promise<any> => {
         throw new Error('Empty AI response');
       }
 
-      const parsed = JSON.parse(content);
+      const parsed = cleanAndParseJson(content);
       console.log(`[Nvidia Client] Success with model: ${modelName}`);
       return parsed;
-    } catch (error: any) {
-      console.warn(`[Nvidia Client] Model ${modelName} failed or timed out. Error:`, error.message || error);
-      lastError = error;
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.warn(`[Nvidia Client] Model ${modelName} failed or timed out. Error:`, msg);
+      lastError = error instanceof Error ? error : new Error(msg);
     }
   }
 
@@ -65,3 +67,27 @@ export const callNvidiaAI = async (params: NvidiaAIParams): Promise<any> => {
     data: null,
   };
 };
+
+/**
+ * Clean potential markdown wrappers and extract/parse valid JSON from the AI response.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function cleanAndParseJson(content: string): any {
+  let cleaned = content.trim();
+
+  // Strip markdown code block wrappers if they exist
+  cleaned = cleaned.replace(/^```json\s*/i, '');
+  cleaned = cleaned.replace(/^```\s*/i, '');
+  cleaned = cleaned.replace(/\s*```$/, '');
+  cleaned = cleaned.trim();
+
+  // Extract the main JSON object if the LLM output includes leading or trailing text
+  const firstBrace = cleaned.indexOf('{');
+  const lastBrace = cleaned.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+  }
+
+  return JSON.parse(cleaned);
+}
+
