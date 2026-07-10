@@ -1,304 +1,524 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import CategoryFilter from '@/components/product/CategoryFilter';
-import ProductCard from '@/components/product/ProductCard';
-import ProductComparison from '@/components/product/ProductComparison';
-import { ProductCardSkeleton } from '@/components/ui/Skeleton';
-import useProducts from '@/hooks/useProducts';
-import useSearchProducts from '@/hooks/useSearchProducts';
-import { Product } from '@/types';
-import { Search, ChevronLeft, ChevronRight, SlidersHorizontal, ArrowRightLeft, X, Sparkles } from 'lucide-react';
-
-const ITEMS_PER_PAGE = 8;
+import { useFavorites } from '@/hooks/useFavorites';
+import { useAuth } from '@/hooks/useAuth';
+import { 
+  Sparkles, 
+  Search, 
+  ArrowRight, 
+  ArrowRightLeft, 
+  Heart, 
+  ShoppingCart, 
+  Star, 
+  ChevronLeft, 
+  ChevronRight, 
+  MessageSquare,
+  Sparkle,
+  BadgeAlert,
+  Bot,
+  Layers,
+  Sparkle as SparkleIcon,
+  ShieldCheck,
+  Check
+} from 'lucide-react';
 
 export default function HomePage() {
-  // Query & filter states
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [sortBy, setSortBy] = useState('');
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
-  const [page, setPage] = useState(1);
+  const [emailInput, setEmailInput] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
-  // Comparison states
-  const [compareProducts, setCompareProducts] = useState<Product[]>([]);
-  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
+  // Trending Products data
+  const trendingProducts = [
+    {
+      id: 901,
+      title: 'Aura Sound Max Wireless',
+      price: 299.00,
+      rating: 4.9,
+      category: 'Electronics',
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      id: 902,
+      title: 'Zenith Watch Pro',
+      price: 349.00,
+      rating: 4.8,
+      category: 'Wearables',
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      id: 903,
+      title: 'Nova Mechanical Core',
+      price: 159.00,
+      rating: 4.7,
+      category: 'Computing',
+      image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      id: 904,
+      title: 'Lumina X-900 Mirrorless',
+      price: 1299.00,
+      rating: 5.0,
+      category: 'Photography',
+      image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&auto=format&fit=crop&q=80',
+    },
+  ];
 
-  // Debounce search input
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-      setPage(1); // Reset page on new search
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  // Handle category changes
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
-    setSearchQuery(''); // Clear search query when category changes
-    setDebouncedQuery('');
-    setPage(1); // Reset to first page
-  };
-
-  // Handle sorting changes
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    if (value === '') {
-      setSortBy('');
-    } else {
-      const [field, dir] = value.split('-');
-      setSortBy(field);
-      setOrder(dir as 'asc' | 'desc');
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/chat?query=${encodeURIComponent(searchQuery.trim())}`);
     }
-    setPage(1); // Reset to first page
   };
 
-  // Determine query parameters
-  const skip = (page - 1) * ITEMS_PER_PAGE;
-  const isSearching = debouncedQuery.trim().length > 0;
-
-  // Custom data queries
-  const normalQuery = useProducts({
-    limit: ITEMS_PER_PAGE,
-    skip,
-    category: selectedCategory || undefined,
-    sortBy: sortBy || undefined,
-    order: sortBy ? order : undefined,
-  });
-
-  const searchQueryResults = useSearchProducts({
-    query: debouncedQuery,
-    limit: ITEMS_PER_PAGE,
-    skip,
-  });
-
-  // Pick the active query based on search input
-  const activeQuery = isSearching ? searchQueryResults : normalQuery;
-  const { data, isLoading, error } = activeQuery;
-
-  // Pagination calculation
-  const totalProducts = data?.total || 0;
-  const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
-
-  // Compare toggles
-  const handleCompareToggle = (product: Product) => {
-    setCompareProducts((prev) => {
-      const exists = prev.some((p) => p.id === product.id);
-      if (exists) {
-        return prev.filter((p) => p.id !== product.id);
-      }
-      if (prev.length >= 2) {
-        // Replace second item if limit reached
-        return [prev[0], product];
-      }
-      return [...prev, product];
-    });
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (emailInput.trim()) {
+      setSubscribed(true);
+      setEmailInput('');
+      setTimeout(() => setSubscribed(false), 5000);
+    }
   };
 
-  const removeCompareProduct = (id: number) => {
-    setCompareProducts((prev) => prev.filter((p) => p.id !== id));
+  const handleFavoriteClick = (productId: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=${encodeURIComponent('/')}`);
+      return;
+    }
+    toggleFavorite(productId);
+  };
+
+  const handleAddToCart = () => {
+    setCartCount(prev => prev + 1);
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 relative">
+    <div className="min-h-screen flex flex-col bg-white text-slate-800 relative">
       <Navbar />
 
-      {/* Hero section */}
-      <section className="relative overflow-hidden py-12 border-b border-slate-900/60 bg-gradient-to-b from-indigo-950/20 via-slate-950 to-slate-950">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl -z-10" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl -z-10" />
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-16 md:py-24 bg-white text-center">
+        {/* Soft background glows */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-50/40 rounded-full blur-3xl -z-10 pointer-events-none" />
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-1 bg-[#eef2ff] text-[#3b42c4] font-extrabold text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full mb-6">
+            <span className="text-[12px] leading-none select-none">✦</span>
+            <span>Next-Gen Shopping AI</span>
+          </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          {/* Heading */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-none max-w-3xl">
+            Find the <span className="bg-gradient-to-r from-[#3b42c4] to-indigo-500 bg-clip-text text-transparent">Perfect Product</span> with AI
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-slate-500 mt-6 text-base sm:text-lg max-w-2xl leading-relaxed">
+            Stop scrolling and start finding. Our intelligent engine analyzes millions of products to match your exact needs in seconds.
+          </p>
+
+          {/* Search Box */}
+          <form onSubmit={handleSearchSubmit} className="w-full max-w-2xl mt-10">
+            <div className="relative flex items-center bg-white border border-slate-200 focus-within:border-[#3b42c4] focus-within:ring-1 focus-within:ring-[#3b42c4] rounded-2xl p-2 shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all">
+              <Sparkles className="w-5 h-5 text-[#3b42c4] ml-3 shrink-0" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Ask AI anything... e.g. Recommend a gaming laptop under $1000"
+                className="w-full bg-transparent text-slate-800 placeholder-slate-400 pl-3 pr-4 py-2.5 outline-none text-sm font-semibold"
+              />
+              <button
+                type="submit"
+                className="bg-[#3b42c4] hover:bg-[#2d33a6] text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-sm text-sm shrink-0 cursor-pointer"
+              >
+                Search
+              </button>
+            </div>
+          </form>
+
+          {/* Actions */}
+          <div className="flex flex-wrap justify-center items-center gap-4 mt-8">
+            <Link
+              href="/products"
+              className="bg-[#3b42c4] hover:bg-[#2d33a6] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-sm text-sm"
+            >
+              Start Shopping
+            </Link>
+            <Link
+              href="/chat"
+              className="bg-white hover:bg-slate-50 text-[#3b42c4] border border-slate-200 font-bold py-3 px-6 rounded-xl transition-all text-sm flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Try AI Assistant</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Category Section */}
+      <section id="categories" className="py-16 bg-white border-t border-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full text-xs font-semibold uppercase tracking-wider mb-3">
-                <Sparkles className="w-3.5 h-3.5 fill-current animate-pulse" /> AI-Driven Commerce
-              </span>
-              <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-                Discover the Perfect Products
-              </h1>
-              <p className="text-slate-400 mt-3 text-base sm:text-lg max-w-2xl leading-relaxed">
-                Browse our premium catalog, compare items side-by-side, and let our intelligent assistant guide your choices.
+              <h2 className="text-2xl font-black tracking-tight text-slate-900">
+                Shop by Category
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Curated collections for every lifestyle.
               </p>
+            </div>
+            <Link
+              href="/products"
+              className="flex items-center gap-1 text-sm font-bold text-[#3b42c4] hover:underline"
+            >
+              <span>View all</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Custom Category Grid Layout */}
+          <div className="space-y-6">
+            {/* Top Grid Area */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Smartphones (tall, left card) */}
+              <Link
+                href="/products?category=smartphones"
+                className="md:row-span-2 relative overflow-hidden rounded-[24px] bg-slate-50 h-[320px] md:h-full min-h-[360px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80"
+                  alt="Smartphones"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {/* Light overlay at the bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/20 to-transparent z-0" />
+                <div className="absolute bottom-6 left-6 z-10 flex flex-col items-start gap-1">
+                  <span className="bg-[#eef2ff] text-[#3b42c4] font-extrabold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-md">
+                    Tech Hub
+                  </span>
+                  <span className="text-xl font-bold text-slate-800">
+                    Smartphones
+                  </span>
+                </div>
+              </Link>
+
+              {/* Laptops (wide, top right card) */}
+              <Link
+                href="/products?category=laptops"
+                className="md:col-span-2 relative overflow-hidden rounded-[24px] bg-slate-50 h-[220px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1496181130204-7552cc145cdb?w=600&auto=format&fit=crop&q=80"
+                  alt="Laptops"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-0" />
+                <div className="absolute bottom-6 left-6 z-10">
+                  <span className="text-xl font-bold text-slate-800">
+                    Laptops
+                  </span>
+                </div>
+              </Link>
+
+              {/* Furniture */}
+              <Link
+                href="/products?category=furniture"
+                className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[220px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&auto=format&fit=crop&q=80"
+                  alt="Furniture"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-0" />
+                <div className="absolute bottom-6 left-6 z-10">
+                  <span className="text-xl font-bold text-slate-800">
+                    Furniture
+                  </span>
+                </div>
+              </Link>
+
+              {/* Beauty */}
+              <Link
+                href="/products?category=beauty"
+                className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[220px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1608248597481-496100c80836?w=600&auto=format&fit=crop&q=80"
+                  alt="Beauty"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-0" />
+                <div className="absolute bottom-6 left-6 z-10">
+                  <span className="text-xl font-bold text-slate-800">
+                    Beauty
+                  </span>
+                </div>
+              </Link>
+            </div>
+
+            {/* Bottom Grid Area */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Groceries */}
+              <Link
+                href="/products?category=groceries"
+                className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[180px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80"
+                  alt="Groceries"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-0" />
+                <div className="absolute bottom-6 left-6 z-10">
+                  <span className="text-xl font-bold text-slate-800">
+                    Groceries
+                  </span>
+                </div>
+              </Link>
+
+              {/* Fragrances */}
+              <Link
+                href="/products?category=fragrances"
+                className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[180px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80"
+                  alt="Fragrances"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-0" />
+                <div className="absolute bottom-6 left-6 z-10">
+                  <span className="text-xl font-bold text-slate-800">
+                    Fragrances
+                  </span>
+                </div>
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Browse Shell */}
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
-        
-        {/* Filter Controls Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-900/10 border border-slate-900 p-4 rounded-3xl mb-8 backdrop-blur-md">
-          {/* Search Input */}
-          <div className="relative w-full md:max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
-              className="w-full bg-slate-950/60 hover:bg-slate-950/90 focus:bg-slate-950 border border-slate-900 focus:border-indigo-500 text-slate-200 rounded-2xl pl-12 pr-4 py-3 outline-none transition-all text-sm placeholder-slate-600"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+      {/* AI Powered Features Section */}
+      <section className="py-16 bg-[#f4f7fe]/40 border-t border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+            AI-Powered Precision
+          </h2>
+          <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
+            Experience shopping at the speed of thought with our suite of intelligent features.
+          </p>
 
-          {/* Sort Selector */}
-          <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
-            <SlidersHorizontal className="w-4 h-4 text-slate-500 hidden sm:block" />
-            <select
-              onChange={handleSortChange}
-              className="w-full md:w-48 bg-slate-950/60 border border-slate-900 text-slate-300 focus:border-indigo-500 rounded-2xl px-4 py-3 outline-none transition-all text-sm cursor-pointer"
-            >
-              <option value="">Default Sort</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="rating-desc">Rating: Highest First</option>
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
+            {/* feature 1 */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.01)] text-left flex flex-col h-full relative overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-[#3b42c4] mb-4">
+                <SparkleIcon className="w-5 h-5 fill-current" />
+              </div>
+              <h3 className="text-base font-bold text-slate-800 mb-2">Smart Recommendations</h3>
+              <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                Personalized picks based on your style, behavior, and preferences.
+              </p>
+              <div className="absolute bottom-0 inset-x-0 h-1 bg-[#3b42c4]" />
+            </div>
+
+            {/* feature 2 */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.01)] text-left flex flex-col h-full relative overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 mb-4">
+                <Layers className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-bold text-slate-800 mb-2">Review Summaries</h3>
+              <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                Instantly digest thousands of customer reviews into key pros and cons.
+              </p>
+              <div className="absolute bottom-0 inset-x-0 h-1 bg-purple-500" />
+            </div>
+
+            {/* feature 3 */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.01)] text-left flex flex-col h-full relative overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 mb-4">
+                <ArrowRightLeft className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-bold text-slate-800 mb-2">Price Comparisons</h3>
+              <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                Real-time tracking and comparison across 1,000+ top retailers.
+              </p>
+              <div className="absolute bottom-0 inset-x-0 h-1 bg-orange-500" />
+            </div>
+
+            {/* feature 4 */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.01)] text-left flex flex-col h-full relative overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
+                <Bot className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-bold text-slate-800 mb-2">Personal Assistant</h3>
+              <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                Chat 24/7 with your personal shopper to find anything you need.
+              </p>
+              <div className="absolute bottom-0 inset-x-0 h-1 bg-blue-500" />
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Content Layout Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Left Category Sidebar */}
-          <aside className="md:col-span-1 border-r border-slate-900/60 pr-0 md:pr-6">
-            <CategoryFilter
-              selectedCategory={selectedCategory}
-              onSelectCategory={handleCategorySelect}
-            />
-          </aside>
-
-          {/* Right Product Grid */}
-          <section className="md:col-span-3">
-            {error ? (
-              <div className="text-center py-16 bg-red-950/10 border border-red-950 rounded-3xl px-6">
-                <p className="text-red-400 font-medium">Failed to retrieve products.</p>
-                <p className="text-slate-500 text-sm mt-1">Please check your internet connection and try again.</p>
-              </div>
-            ) : isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <ProductCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : !data || data.products.length === 0 ? (
-              <div className="text-center py-20 bg-slate-900/10 border border-slate-900 rounded-3xl">
-                <p className="text-slate-400 text-base font-medium">No products matching your search.</p>
-                <p className="text-slate-500 text-xs mt-1">Try refining your keyword or filtering by category.</p>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {data.products.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      isComparingSelected={compareProducts.some((p) => p.id === product.id)}
-                      onCompareToggle={() => handleCompareToggle(product)}
-                      canCompare={compareProducts.length < 2}
-                    />
-                  ))}
-                </div>
-
-                {/* Pagination Controls */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-between mt-12 pt-6 border-t border-slate-900/60">
-                    <button
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page === 1}
-                      className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 text-slate-300 rounded-xl text-sm font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      <span>Previous</span>
-                    </button>
-
-                    <span className="text-sm font-medium text-slate-400">
-                      Page <span className="text-white font-bold">{page}</span> of {totalPages}
-                    </span>
-
-                    <button
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={page === totalPages}
-                      className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 text-slate-300 rounded-xl text-sm font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      <span>Next</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </section>
-        </div>
-      </main>
-
-      {/* Sticky Bottom Comparison Shelf */}
-      {compareProducts.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-2xl backdrop-blur-xl bg-slate-900/90 border border-slate-800/90 shadow-2xl rounded-3xl p-4 sm:p-5 flex items-center justify-between gap-4 animate-slideUp">
-          <div className="flex items-center gap-4 overflow-x-auto scrollbar-none py-1">
-            <div className="hidden sm:flex w-10 h-10 bg-indigo-500/10 rounded-xl items-center justify-center text-indigo-400">
-              <ArrowRightLeft className="w-5 h-5 animate-pulse" />
+      {/* Trending Now Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-black tracking-tight text-slate-900">
+                Trending Now
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Real-time popular products tailored for you.
+              </p>
             </div>
             
-            {compareProducts.map((p) => (
-              <div key={p.id} className="relative flex items-center gap-2 bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-2xl shrink-0">
-                <img
-                  src={p.thumbnail}
-                  alt={p.title}
-                  className="w-7 h-7 object-cover bg-slate-900 rounded-lg border border-slate-800"
-                />
-                <span className="text-xs font-semibold text-slate-300 max-w-[100px] truncate">{p.title}</span>
-                <button
-                  onClick={() => removeCompareProduct(p.id)}
-                  className="p-0.5 hover:bg-slate-800 rounded-md text-slate-500 hover:text-rose-400 transition-all cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
+            {/* Slider arrows */}
+            <div className="flex items-center gap-2">
+              <button className="p-2 border border-slate-200 rounded-full hover:bg-slate-50 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
+                <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
+              </button>
+              <button className="p-2 border border-slate-200 rounded-full hover:bg-slate-50 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
+                <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
 
-            {compareProducts.length === 1 && (
-              <span className="text-xs text-slate-500 italic hidden sm:inline">
-                Select 1 more item to compare...
-              </span>
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {trendingProducts.map((p) => {
+              const isFav = isFavorite(p.id);
+              return (
+                <div 
+                  key={p.id}
+                  className="bg-white border border-slate-200/60 rounded-[20px] p-4 flex flex-col relative group transition-all duration-300 hover:shadow-md"
+                >
+                  {/* Heart button */}
+                  <button
+                    onClick={(e) => handleFavoriteClick(p.id, e)}
+                    className={`absolute top-6 right-6 p-2 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${
+                      isFav
+                        ? 'bg-rose-50 border-rose-200 text-rose-500'
+                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
+                    }`}
+                  >
+                    <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
+                  </button>
+
+                  {/* Image container */}
+                  <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-50 mb-4 border border-slate-100">
+                    <img
+                      src={p.image}
+                      alt={p.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+
+                  {/* Meta: Category & rating */}
+                  <div className="flex items-center justify-between text-[11px] mb-2">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider">{p.category}</span>
+                    <div className="flex items-center gap-1 text-amber-500">
+                      <Star className="w-3.5 h-3.5 fill-current" />
+                      <span className="font-extrabold">{p.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-sm font-bold text-slate-800 line-clamp-1 mb-3">
+                    {p.title}
+                  </h3>
+
+                  {/* Price and Cart */}
+                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
+                    <span className="text-base font-black text-slate-900">${p.price.toFixed(2)}</span>
+                    
+                    <button
+                      onClick={handleAddToCart}
+                      className="p-2.5 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter CTA Section */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-r from-[#3b42c4] to-indigo-800 rounded-[32px] p-8 md:p-12 text-center text-white relative overflow-hidden shadow-lg shadow-indigo-600/10">
+            {/* Background elements */}
+            <div className="absolute -top-24 -left-24 w-80 h-80 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-2">
+              Ready for Smarter Shopping?
+            </h2>
+            <p className="text-indigo-100 text-sm md:text-base max-w-xl mx-auto mb-8 font-medium">
+              Join over 500,000 shoppers using CartIQ to find the best deals and the perfect products every single day.
+            </p>
+
+            {subscribed ? (
+              <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-2xl p-4 max-w-md mx-auto text-emerald-200 text-sm flex items-center justify-center gap-2 animate-fadeIn">
+                <Check className="w-5 h-5 shrink-0" />
+                <span className="font-bold">Thank you! You've joined CartIQ successfully.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
+                <input
+                  type="email"
+                  required
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="Enter your email"
+                  className="w-full bg-white/10 hover:bg-white/15 focus:bg-white/20 border border-white/20 focus:border-white/50 text-white placeholder-indigo-200/80 rounded-xl px-4 py-3 outline-none text-sm transition-all font-semibold"
+                />
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto bg-white hover:bg-slate-50 text-[#3b42c4] font-black px-6 py-3 rounded-xl transition-all shadow-md text-sm shrink-0 cursor-pointer"
+                >
+                  Join Now
+                </button>
+              </form>
             )}
           </div>
-
-          <button
-            onClick={() => setIsComparisonOpen(true)}
-            disabled={compareProducts.length < 2}
-            className="shrink-0 flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 text-white disabled:text-slate-500 rounded-2xl text-xs font-extrabold transition-all duration-200 shadow-lg shadow-indigo-600/10 cursor-pointer disabled:cursor-not-allowed"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Compare Specs</span>
-          </button>
         </div>
-      )}
+      </section>
 
-      {/* Comparison Fullscreen Modal */}
-      {isComparisonOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-slate-900/95 border border-slate-800 shadow-2xl rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <ProductComparison
-              productA={compareProducts[0]}
-              productB={compareProducts[1]}
-              onClose={() => setIsComparisonOpen(false)}
-            />
-          </div>
-        </div>
-      )}
+      {/* Floating AI Assistant Robot Toggle Button */}
+      <Link
+        href="/chat"
+        title="Open AI Chat Assistant"
+        className="fixed bottom-6 right-6 z-40 bg-black text-white hover:bg-slate-900 p-4 rounded-full shadow-lg cursor-pointer hover:scale-105 transition-all flex items-center justify-center w-14 h-14"
+      >
+        <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          {/* Custom robot face SVG */}
+          <rect x="3" y="11" width="18" height="10" rx="2" />
+          <circle cx="12" cy="5" r="2" />
+          <path d="M12 7v4" />
+          <line x1="8" y1="16" x2="8" y2="16.01" />
+          <line x1="16" y1="16" x2="16" y2="16.01" />
+          <path d="M9 11v-2a3 3 0 0 1 6 0v2" />
+        </svg>
+      </Link>
 
       <Footer />
     </div>

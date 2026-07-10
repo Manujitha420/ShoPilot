@@ -28,7 +28,7 @@ export default function CategoryFilter({
           {[...Array(8)].map((_, i) => (
             <div
               key={i}
-              className="h-9 w-full bg-slate-900/30 border border-slate-900 animate-pulse rounded-xl"
+              className="h-9 w-full bg-slate-100 border border-slate-200/60 animate-pulse rounded-xl"
             />
           ))}
         </div>
@@ -37,10 +37,10 @@ export default function CategoryFilter({
           {/* "All Products" Button */}
           <button
             onClick={() => onSelectCategory('')}
-            className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer shrink-0 ${
+            className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer shrink-0 ${
               selectedCategory === ''
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10'
-                : 'bg-slate-900/30 hover:bg-slate-900/60 border border-slate-900 hover:border-slate-800 text-slate-400 hover:text-slate-200'
+                ? 'bg-[#3b42c4] text-white shadow-sm'
+                : 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-800'
             }`}
           >
             <LayoutGrid className="w-4 h-4" />
@@ -55,10 +55,10 @@ export default function CategoryFilter({
               <button
                 key={cat.slug}
                 onClick={() => onSelectCategory(cat.slug)}
-                className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer shrink-0 ${
+                className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer shrink-0 ${
                   isSelected
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10'
-                    : 'bg-slate-900/30 hover:bg-slate-900/60 border border-slate-900 hover:border-slate-800 text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#3b42c4] text-white shadow-sm'
+                    : 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-800'
                 }`}
               >
                 <span className="truncate max-w-[150px]">{cat.name}</span>

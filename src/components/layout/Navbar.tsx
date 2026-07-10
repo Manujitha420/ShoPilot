@@ -1,101 +1,153 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { Sparkles, Heart, MessageSquare, LogOut, LogIn, ShoppingBag } from 'lucide-react';
+import { Bell, ShoppingCart, LogOut, User } from 'lucide-react';
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const navLinks = [
-    { href: '/', label: 'Browse', icon: ShoppingBag },
-    { href: '/chat', label: 'AI Assistant', icon: Sparkles },
-    ...(isAuthenticated ? [{ href: '/favorites', label: 'Favorites', icon: Heart }] : []),
+    { href: '/', label: 'Home' },
+    { href: '/products', label: 'Products' },
+    { href: '/#categories', label: 'Categories' },
+    { href: '/favorites', label: 'Favorites' },
   ];
 
+  const handleCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // If we're on the home page, intercept and scroll smoothly
+    if (pathname === '/') {
+      e.preventDefault();
+      const el = document.getElementById('categories');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-slate-950/70 border-b border-slate-900/80 shadow-sm">
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/10 group-hover:scale-105 transition-transform duration-200">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">
-              ShoPilot
+          <Link href="/" className="flex items-center gap-2 group shrink-0">
+            <span className="text-xl font-bold tracking-tight text-[#3b42c4]">
+              shoPilot
             </span>
           </Link>
 
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6">
+          {/* Navigation Links - Centered */}
+          <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
             {navLinks.map((link) => {
-              const Icon = link.icon;
-              const isActive = pathname === link.href;
+              const isCategoriesLink = link.href === '/#categories';
+              
+              // Define active states
+              let isActive = false;
+              if (isCategoriesLink) {
+                isActive = false; // Categories is scroll-based anchor
+              } else if (link.href === '/') {
+                isActive = pathname === '/';
+              } else {
+                isActive = pathname?.startsWith(link.href);
+              }
+
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-slate-900/60 ${
+                  onClick={isCategoriesLink ? handleCategoryClick : undefined}
+                  className={`text-sm font-semibold tracking-wide transition-all duration-200 py-1.5 px-1 relative ${
                     isActive
-                      ? 'text-indigo-400 bg-slate-900/40 border border-slate-800/40'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'text-[#3b42c4]'
+                      : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
                   <span>{link.label}</span>
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3b42c4] rounded-full" />
+                  )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* User Auth controls */}
-          <div className="flex items-center gap-4">
-            {isAuthenticated && user ? (
-              <div className="flex items-center gap-3">
-                {/* User Info (Desktop) */}
-                <div className="hidden sm:flex flex-col text-right">
-                  <span className="text-sm font-semibold text-slate-200">
-                    {user.firstName} {user.lastName}
-                  </span>
-                  <span className="text-xs text-slate-500">@{user.username}</span>
-                </div>
-                
-                {/* User Image */}
-                {user.image ? (
+          {/* User controls (Notification, Cart, Avatar) */}
+          <div className="flex items-center gap-4 sm:gap-6">
+            {/* Notification Bell */}
+            <button className="p-2 hover:bg-slate-50 rounded-full transition-colors relative cursor-pointer text-slate-500 hover:text-slate-800">
+              <Bell className="w-5 h-5 stroke-[2]" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full border border-white" />
+            </button>
+
+            {/* Shopping Cart */}
+            <button className="p-2 hover:bg-slate-50 rounded-full transition-colors cursor-pointer text-slate-500 hover:text-slate-800">
+              <ShoppingCart className="w-5 h-5 stroke-[2]" />
+            </button>
+
+            {/* Profile Avatar Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  if (isAuthenticated) {
+                    setIsDropdownOpen(!isDropdownOpen);
+                  } else {
+                    router.push('/login');
+                  }
+                }}
+                className="w-9 h-9 rounded-full overflow-hidden border border-slate-200 cursor-pointer hover:border-slate-400 transition-all flex items-center justify-center bg-slate-100"
+              >
+                {isAuthenticated && user?.image ? (
                   <img
                     src={user.image}
                     alt={user.username}
-                    className="w-10 h-10 rounded-full border border-slate-800 bg-slate-900 p-0.5 object-cover"
+                    className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-sm font-bold text-indigo-400">
-                    {user.firstName[0]}
-                  </div>
+                  <img
+                    src="https://dummyjson.com/icon/emilys/128"
+                    alt="Default Avatar"
+                    className="w-full h-full object-cover"
+                  />
                 )}
+              </button>
 
-                {/* Logout Button */}
-                <button
-                  onClick={logout}
-                  title="Sign Out"
-                  className="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-red-900/50 hover:bg-red-950/20 text-slate-400 hover:text-red-400 transition-all duration-200 cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold transition-all duration-200 shadow-md shadow-indigo-600/10 cursor-pointer"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Sign In</span>
-              </Link>
-            )}
+              {/* Dropdown Menu for Authenticated Users */}
+              {isDropdownOpen && isAuthenticated && user && (
+                <div className="absolute right-0 mt-3 w-56 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 animate-fadeIn">
+                  <div className="px-4 py-2 border-b border-slate-50">
+                    <p className="text-sm font-bold text-slate-800 truncate">
+                      {user.firstName} {user.lastName}
+                    </p>
+                    <p className="text-xs text-slate-400 truncate">@{user.username}</p>
+                  </div>
+                  
+                  <Link
+                    href="/favorites"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  >
+                    <span>My Favorites</span>
+                  </Link>
+
+                  <button
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      logout();
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-colors text-left cursor-pointer font-medium"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
