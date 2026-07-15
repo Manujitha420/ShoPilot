@@ -7,16 +7,16 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
-import { 
-  Sparkles, 
-  Search, 
-  ArrowRight, 
-  ArrowRightLeft, 
-  Heart, 
-  ShoppingCart, 
-  Star, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  Sparkles,
+  Search,
+  ArrowRight,
+  ArrowRightLeft,
+  Heart,
+  ShoppingCart,
+  Star,
+  ChevronLeft,
+  ChevronRight,
   MessageSquare,
   Sparkle,
   BadgeAlert,
@@ -31,7 +31,7 @@ export default function HomePage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -110,7 +110,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden py-16 md:py-24 bg-white text-center">
         {/* Soft background glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-50/40 rounded-full blur-3xl -z-10 pointer-events-none" />
-        
+
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-1 bg-[#eef2ff] text-[#3b42c4] font-extrabold text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full mb-6">
@@ -229,7 +229,7 @@ export default function HomePage() {
                     Tech Hub
                   </span>
                   <span className="text-xl font-bold text-slate-800">
-                    Smartphones
+                    Electronics
                   </span>
                 </div>
               </Link>
@@ -441,7 +441,7 @@ export default function HomePage() {
                 Real-time popular products tailored for you.
               </p>
             </div>
-            
+
             {/* Slider arrows */}
             <div className="flex items-center gap-2">
               <button className="p-2 border border-slate-200 rounded-full hover:bg-slate-50 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
@@ -458,18 +458,17 @@ export default function HomePage() {
             {trendingProducts.map((p) => {
               const isFav = isFavorite(p.id);
               return (
-                <div 
+                <div
                   key={p.id}
                   className="bg-white border border-slate-200/60 rounded-[20px] p-4 flex flex-col relative group transition-all duration-300 hover:shadow-md"
                 >
                   {/* Heart button */}
                   <button
                     onClick={(e) => handleFavoriteClick(p.id, e)}
-                    className={`absolute top-6 right-6 p-2 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${
-                      isFav
+                    className={`absolute top-6 right-6 p-2 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${isFav
                         ? 'bg-rose-50 border-rose-200 text-rose-500'
                         : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
-                    }`}
+                      }`}
                   >
                     <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
                   </button>
@@ -500,7 +499,7 @@ export default function HomePage() {
                   {/* Price and Cart */}
                   <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
                     <span className="text-base font-black text-slate-900">${p.price.toFixed(2)}</span>
-                    
+
                     <button
                       onClick={handleAddToCart}
                       className="p-2.5 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
