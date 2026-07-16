@@ -34,7 +34,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
-          
+
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group shrink-0">
             <span className="text-xl font-bold tracking-tight text-[#3b42c4]">
@@ -46,7 +46,7 @@ export default function Navbar() {
           <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
             {navLinks.map((link) => {
               const isCategoriesLink = link.href === '/#categories';
-              
+
               // Define active states
               let isActive = false;
               if (isCategoriesLink) {
@@ -62,11 +62,10 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={isCategoriesLink ? handleCategoryClick : undefined}
-                  className={`text-sm font-semibold tracking-wide transition-all duration-200 py-1.5 px-1 relative ${
-                    isActive
-                      ? 'text-[#3b42c4]'
-                      : 'text-slate-500 hover:text-slate-900'
-                  }`}
+                  className={`text-sm font-semibold tracking-wide transition-all duration-200 py-1.5 px-1 relative ${isActive
+                    ? 'text-[#3b42c4]'
+                    : 'text-slate-500 hover:text-slate-900'
+                    }`}
                 >
                   <span>{link.label}</span>
                   {isActive && (
@@ -126,7 +125,7 @@ export default function Navbar() {
                     </p>
                     <p className="text-xs text-slate-400 truncate">@{user.username}</p>
                   </div>
-                  
+
                   <Link
                     href="/favorites"
                     onClick={() => setIsDropdownOpen(false)}
@@ -148,6 +147,48 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Scrolling Discount Banner */}
+      <div className="w-full bg-[#3b42c4] text-white overflow-hidden py-4 text-[13px] font-bold select-none border-t border-indigo-500/20 relative z-50">
+        <style>{`
+          @keyframes marquee-ltr {
+            0% {
+              transform: translateX(-50%);
+            }
+            100% {
+              transform: translateX(0);
+            }
+          }
+          .marquee-container {
+            display: flex;
+            width: max-content;
+            animation: marquee-ltr 28s linear infinite;
+          }
+          .marquee-container:hover {
+            animation-play-state: paused;
+          }
+          .marquee-item {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            gap: 6rem;
+            padding-right: 6rem;
+            white-space: nowrap;
+          }
+        `}</style>
+        <div className="marquee-container cursor-pointer">
+          <div className="marquee-item">
+            <span>⚡ TODAY'S AI MATCH PROMO: Use code <strong className="text-amber-300">AISHOP20</strong> for 20% off high-rated laptops & smartphones!</span>
+            <span>🎁 FREE EXPRESS SHIPPING: Automatically applied on checkout for orders over $100!</span>
+            <span>⭐ SHOPILOT DEALS: Chat with our AI Shopping Assistant to find secret discounts!</span>
+          </div>
+          <div className="marquee-item">
+            <span>⚡ TODAY'S AI MATCH PROMO: Use code <strong className="text-amber-300">AISHOP20</strong> for 20% off high-rated laptops & smartphones!</span>
+            <span>🎁 FREE EXPRESS SHIPPING: Automatically applied on checkout for orders over $100!</span>
+            <span>⭐ SHOPILOT DEALS: Chat with our AI Shopping Assistant to find secret discounts!</span>
           </div>
         </div>
       </div>
