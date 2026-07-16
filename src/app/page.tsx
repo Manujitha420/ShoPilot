@@ -24,7 +24,9 @@ import {
   Layers,
   Sparkle as SparkleIcon,
   ShieldCheck,
-  Check
+  Check,
+  Clock,
+  Flame
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -36,6 +38,259 @@ export default function HomePage() {
   const [emailInput, setEmailInput] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+
+  // Custom states for new interactive sections
+  const [activeAiTab, setActiveAiTab] = useState<'recommended' | 'trending' | 'interests' | 'recent' | 'continue' | 'featured'>('recommended');
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [timeLeft, setTimeLeft] = useState({ hours: 10, minutes: 45, seconds: 0 });
+
+  // Countdown timer effect
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 };
+        } else if (prev.minutes > 0) {
+          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        } else if (prev.hours > 0) {
+          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        } else {
+          return { hours: 12, minutes: 0, seconds: 0 };
+        }
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Today's Deals (Flash Sale) data
+  const todayDeals = [
+    {
+      id: 931,
+      title: 'Aura Sound Max Wireless (Matte Black)',
+      category: 'Electronics',
+      originalPrice: 299.00,
+      price: 179.00,
+      discount: 40,
+      rating: 4.9,
+      claimed: 82,
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      id: 932,
+      title: 'Zenith Watch Pro Series 5',
+      category: 'Wearables',
+      originalPrice: 349.00,
+      price: 226.85,
+      discount: 35,
+      rating: 4.8,
+      claimed: 64,
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      id: 933,
+      title: 'Nova Mechanical Core Tactile Keyboard',
+      category: 'Computing',
+      originalPrice: 159.00,
+      price: 111.30,
+      discount: 30,
+      rating: 4.7,
+      claimed: 45,
+      image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&auto=format&fit=crop&q=80',
+    }
+  ];
+
+  // AI Recommendation tabs data
+  const aiRecommendedTabs = {
+    recommended: [
+      {
+        id: 901,
+        title: 'Aura Sound Max Wireless',
+        price: 299.00,
+        rating: 4.9,
+        category: 'Electronics',
+        matchScore: 98,
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 902,
+        title: 'Zenith Watch Pro',
+        price: 349.00,
+        rating: 4.8,
+        category: 'Wearables',
+        matchScore: 95,
+        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 903,
+        title: 'Nova Mechanical Core',
+        price: 159.00,
+        rating: 4.7,
+        category: 'Computing',
+        matchScore: 92,
+        image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&auto=format&fit=crop&q=80',
+      }
+    ],
+    trending: [
+      {
+        id: 911,
+        title: 'Ergonomic Mesh Task Chair',
+        price: 249.00,
+        rating: 4.6,
+        category: 'Furniture',
+        matchScore: 94,
+        image: 'https://images.unsplash.com/photo-1580481072645-022f9a6dbf27?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 904,
+        title: 'Lumina X-900 Mirrorless',
+        price: 1299.00,
+        rating: 5.0,
+        category: 'Photography',
+        matchScore: 97,
+        image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 912,
+        title: 'Sonic Glow Smart Toothbrush',
+        price: 89.00,
+        rating: 4.5,
+        category: 'Electronics',
+        matchScore: 91,
+        image: 'https://images.unsplash.com/photo-1559592482-b288b5fc6d76?w=600&auto=format&fit=crop&q=80',
+      }
+    ],
+    interests: [
+      {
+        id: 921,
+        title: 'Hydration Therapy Essence',
+        price: 39.00,
+        rating: 4.7,
+        category: 'Beauty',
+        matchScore: 93,
+        image: 'https://images.unsplash.com/photo-1608248597481-496100c80836?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 922,
+        title: 'Royal Oud Intense Cologne',
+        price: 145.00,
+        rating: 4.8,
+        category: 'Fragrances',
+        matchScore: 96,
+        image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 923,
+        title: 'Smart Ambient Desk Lamp',
+        price: 79.00,
+        rating: 4.6,
+        category: 'Furniture',
+        matchScore: 90,
+        image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&auto=format&fit=crop&q=80',
+      }
+    ],
+    recent: [
+      {
+        id: 901,
+        title: 'Aura Sound Max Wireless',
+        price: 299.00,
+        rating: 4.9,
+        category: 'Electronics',
+        matchScore: 98,
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 922,
+        title: 'Royal Oud Intense Cologne',
+        price: 145.00,
+        rating: 4.8,
+        category: 'Fragrances',
+        matchScore: 96,
+        image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80',
+      }
+    ],
+    continue: [
+      {
+        id: 902,
+        title: 'Zenith Watch Pro',
+        price: 349.00,
+        rating: 4.8,
+        category: 'Wearables',
+        matchScore: 95,
+        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 903,
+        title: 'Nova Mechanical Core',
+        price: 159.00,
+        rating: 4.7,
+        category: 'Computing',
+        matchScore: 92,
+        image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&auto=format&fit=crop&q=80',
+      }
+    ],
+    featured: [
+      {
+        id: 904,
+        title: 'Lumina X-900 Mirrorless',
+        price: 1299.00,
+        rating: 5.0,
+        category: 'Photography',
+        matchScore: 97,
+        image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 901,
+        title: 'Aura Sound Max Wireless',
+        price: 299.00,
+        rating: 4.9,
+        category: 'Electronics',
+        matchScore: 98,
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
+      },
+      {
+        id: 903,
+        title: 'Nova Mechanical Core',
+        price: 159.00,
+        rating: 4.7,
+        category: 'Computing',
+        matchScore: 92,
+        image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&auto=format&fit=crop&q=80',
+      }
+    ]
+  };
+
+  const testimonials = [
+    {
+      name: 'Sarah Connor',
+      role: 'Verified Buyer',
+      rating: 5,
+      comment: "ShoPilot's AI comparison saved me over $200 on my new gaming laptop. It parsed all user reviews instantly, outlining precisely what I needed to watch out for!",
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
+    },
+    {
+      name: 'David Miller',
+      role: 'Tech Enthusiast',
+      rating: 5,
+      comment: "I love the chat interface! Being able to simply ask for a phone with a great camera under $600 and get live listings in seconds feels like magic.",
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80'
+    },
+    {
+      name: 'Jessica Alwi',
+      role: 'Design Lead',
+      rating: 5,
+      comment: "The UI is clean, extremely responsive, and the AI features are genuinely useful. I recommend ShoPilot to all my coworkers who shop online.",
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80'
+    }
+  ];
+
+  const nextTestimonial = () => {
+    setActiveTestimonial(prev => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setActiveTestimonial(prev => (prev - 1 + testimonials.length) % testimonials.length);
+  };
 
   // Trending Products data
   const trendingProducts = [
@@ -176,6 +431,236 @@ export default function HomePage() {
               </span>
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Today's Deals (Flash Sale) Section */}
+      <section className="py-16 bg-slate-50 border-t border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+              <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-600 font-extrabold text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-md mb-2">
+                <Flame className="w-3.5 h-3.5 fill-current animate-pulse" />
+                <span>Flash Sale</span>
+              </span>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Today's Deals</h2>
+              <p className="text-sm text-slate-500 mt-1">Limited-time offers curated with AI precision. Grab them before they're gone!</p>
+            </div>
+
+            {/* Countdown timer UI */}
+            <div className="flex items-center gap-3 bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-2xl shrink-0">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-rose-500" />
+                <span>Ends In</span>
+              </span>
+              <div className="flex items-center gap-1 text-slate-900 font-black text-sm select-none">
+                <span className="bg-slate-100 px-2.5 py-1 rounded-lg w-[38px] text-center">{String(timeLeft.hours).padStart(2, '0')}</span>
+                <span>:</span>
+                <span className="bg-slate-100 px-2.5 py-1 rounded-lg w-[38px] text-center">{String(timeLeft.minutes).padStart(2, '0')}</span>
+                <span>:</span>
+                <span className="bg-slate-100 px-2.5 py-1 rounded-lg w-[38px] text-center text-rose-600 animate-pulse">{String(timeLeft.seconds).padStart(2, '0')}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {todayDeals.map((deal) => {
+              const isFav = isFavorite(deal.id);
+              return (
+                <div
+                  key={deal.id}
+                  className="bg-white border border-slate-200/60 rounded-3xl p-5 flex flex-col relative group transition-all duration-300 hover:shadow-md shadow-sm"
+                >
+                  {/* Discount percentage tag */}
+                  <span className="absolute top-6 left-6 bg-rose-500 text-white font-extrabold text-[10px] tracking-wide uppercase px-2.5 py-1 rounded-lg z-20">
+                    -{deal.discount}% Off
+                  </span>
+
+                  {/* Heart button */}
+                  <button
+                    onClick={(e) => handleFavoriteClick(deal.id, e)}
+                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${
+                      isFav
+                        ? 'bg-rose-50 border-rose-200 text-rose-500'
+                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
+                    }`}
+                  >
+                    <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
+                  </button>
+
+                  {/* Image container */}
+                  <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 mb-5 border border-slate-100 relative">
+                    <img
+                      src={deal.image}
+                      alt={deal.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+
+                  {/* Meta: Category & rating */}
+                  <div className="flex items-center justify-between text-[11px] mb-2 font-bold">
+                    <span className="text-slate-400 uppercase tracking-wider">{deal.category}</span>
+                    <div className="flex items-center gap-1 text-amber-500">
+                      <Star className="w-3.5 h-3.5 fill-current" />
+                      <span>{deal.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-sm font-bold text-slate-800 line-clamp-1 mb-2">
+                    {deal.title}
+                  </h3>
+
+                  {/* Claimed progress bar */}
+                  <div className="space-y-1.5 mb-4 mt-1">
+                    <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                      <span>Limited Offers</span>
+                      <span className="text-slate-600 font-extrabold">{deal.claimed}% claimed</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-rose-500 rounded-full transition-all duration-500"
+                        style={{ width: `${deal.claimed}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Price and Cart */}
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Flash Price</span>
+                      <div className="flex items-baseline gap-1.5 mt-0.5">
+                        <span className="text-lg font-black text-rose-600">${deal.price.toFixed(2)}</span>
+                        <span className="text-slate-400 line-through text-xs font-semibold">${deal.originalPrice.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleAddToCart}
+                      className="p-3 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-2xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
+                    >
+                      <ShoppingCart className="w-4.5 h-4.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* AI Recommendation Section (AI Smart Picks) */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-4">
+            <div>
+              <span className="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 text-[#3b42c4] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
+                <Sparkles className="w-3.5 h-3.5 fill-current" />
+                <span>Recommended For You</span>
+              </span>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">AI Recommendation Dashboard</h2>
+              <p className="text-sm text-slate-500 mt-1">Smart personalization matching your exact shopping style and interests.</p>
+            </div>
+
+            {/* Sub-tabs selection */}
+            <div className="flex flex-wrap items-center gap-1.5 bg-slate-50 border border-slate-200/60 p-1.5 rounded-2xl overflow-x-auto scrollbar-none">
+              {(['recommended', 'trending', 'interests', 'recent', 'continue', 'featured'] as const).map((tab) => {
+                const labels: Record<string, string> = {
+                  recommended: 'For You',
+                  trending: 'Trending',
+                  interests: 'Interests',
+                  recent: 'Recent',
+                  continue: 'Continue',
+                  featured: 'Featured'
+                };
+                const active = activeAiTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveAiTab(tab)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                      active
+                        ? 'bg-white border border-slate-200 shadow-sm text-[#3b42c4]'
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    {labels[tab]}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {aiRecommendedTabs[activeAiTab].map((p) => {
+              const isFav = isFavorite(p.id);
+              return (
+                <div
+                  key={p.id}
+                  className="bg-white border border-slate-200/60 rounded-3xl p-5 flex flex-col relative group transition-all duration-300 hover:shadow-md shadow-sm"
+                >
+                  {/* AI Match Score Badge */}
+                  <span className="absolute top-6 left-6 bg-emerald-50 border border-emerald-100 text-emerald-600 font-extrabold text-[10px] tracking-wide uppercase px-2.5 py-1 rounded-xl z-20 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 fill-current text-emerald-500" />
+                    <span>{p.matchScore}% Match</span>
+                  </span>
+
+                  {/* Heart button */}
+                  <button
+                    onClick={(e) => handleFavoriteClick(p.id, e)}
+                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${
+                      isFav
+                        ? 'bg-rose-50 border-rose-200 text-rose-500'
+                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
+                    }`}
+                  >
+                    <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
+                  </button>
+
+                  {/* Image container */}
+                  <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 mb-5 border border-slate-100 relative">
+                    <img
+                      src={p.image}
+                      alt={p.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+
+                  {/* Meta: Category & rating */}
+                  <div className="flex items-center justify-between text-[11px] mb-2 font-bold">
+                    <span className="text-slate-400 uppercase tracking-wider">{p.category}</span>
+                    <div className="flex items-center gap-1 text-amber-500">
+                      <Star className="w-3.5 h-3.5 fill-current" />
+                      <span>{p.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-sm font-bold text-slate-800 line-clamp-1 mb-4">
+                    {p.title}
+                  </h3>
+
+                  {/* Price and Cart */}
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Price</span>
+                      <span className="text-lg font-black text-slate-900 mt-0.5">${p.price.toFixed(2)}</span>
+                    </div>
+
+                    <button
+                      onClick={handleAddToCart}
+                      className="p-3 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-2xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
+                    >
+                      <ShoppingCart className="w-4.5 h-4.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
         </div>
       </section>
 
@@ -514,6 +999,81 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Customer Reviews Testimonials Carousel Section */}
+      <section className="py-16 bg-[#f8fafc] border-t border-b border-slate-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <span className="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 text-[#3b42c4] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Customer Reviews</span>
+          </span>
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-8">What Our Shoppers Say</h2>
+
+          {/* Testimonial card */}
+          <div className="relative bg-white border border-slate-200/60 rounded-3xl p-8 md:p-12 shadow-sm transition-all duration-300">
+            <div className="absolute top-6 left-6 text-slate-100 text-6xl font-serif select-none pointer-events-none">“</div>
+            
+            <div className="relative z-10 flex flex-col items-center">
+              {/* Stars */}
+              <div className="flex items-center gap-1 text-amber-500 mb-6">
+                {[...Array(testimonials[activeTestimonial].rating)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-current" />
+                ))}
+              </div>
+
+              {/* Comment text */}
+              <p className="text-slate-600 text-base md:text-lg leading-relaxed font-medium italic mb-8 max-w-2xl">
+                &ldquo;{testimonials[activeTestimonial].comment}&rdquo;
+              </p>
+
+              {/* User profile info */}
+              <div className="flex items-center gap-3.5">
+                <img
+                  src={testimonials[activeTestimonial].avatar}
+                  alt={testimonials[activeTestimonial].name}
+                  className="w-12 h-12 rounded-full object-cover border-2 border-slate-100 shadow-sm"
+                />
+                <div className="text-left">
+                  <h4 className="text-sm font-bold text-slate-900">{testimonials[activeTestimonial].name}</h4>
+                  <p className="text-xs text-slate-400 font-semibold">{testimonials[activeTestimonial].role}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Slider arrows */}
+            <div className="absolute inset-y-0 -left-4 md:-left-6 flex items-center">
+              <button
+                onClick={prevTestimonial}
+                className="p-3 bg-white border border-slate-200 rounded-full hover:bg-slate-50 text-slate-500 hover:text-slate-800 cursor-pointer transition-colors shadow-sm"
+              >
+                <ChevronLeft className="w-4.5 h-4.5 stroke-[2.5]" />
+              </button>
+            </div>
+            <div className="absolute inset-y-0 -right-4 md:-right-6 flex items-center">
+              <button
+                onClick={nextTestimonial}
+                className="p-3 bg-white border border-slate-200 rounded-full hover:bg-slate-50 text-slate-500 hover:text-slate-800 cursor-pointer transition-colors shadow-sm"
+              >
+                <ChevronRight className="w-4.5 h-4.5 stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
+
+          {/* Dots Indicator */}
+          <div className="flex justify-center gap-2 mt-6">
+            {testimonials.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveTestimonial(idx)}
+                className={`h-2.5 rounded-full transition-all duration-300 ${
+                  activeTestimonial === idx ? 'w-6 bg-[#3b42c4]' : 'w-2.5 bg-slate-200'
+                }`}
+              />
+            ))}
+          </div>
+
+        </div>
+      </section>
+
       {/* Newsletter CTA Section */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -523,16 +1083,16 @@ export default function HomePage() {
             <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-white/5 rounded-full blur-2xl pointer-events-none" />
 
             <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-2">
-              Ready for Smarter Shopping?
+              Get AI shopping tips.
             </h2>
             <p className="text-indigo-100 text-sm md:text-base max-w-xl mx-auto mb-8 font-medium">
-              Join over 500,000 shoppers using CartIQ to find the best deals and the perfect products every single day.
+              Subscribe to get exclusive AI-curated deals, product comparison insights, and smart shopping recommendations sent directly to your inbox.
             </p>
 
             {subscribed ? (
               <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-2xl p-4 max-w-md mx-auto text-emerald-200 text-sm flex items-center justify-center gap-2 animate-fadeIn">
                 <Check className="w-5 h-5 shrink-0" />
-                <span className="font-bold">Thank you! You've joined CartIQ successfully.</span>
+                <span className="font-bold">Thank you! You've successfully subscribed to AI shopping tips.</span>
               </div>
             ) : (
               <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
@@ -548,7 +1108,7 @@ export default function HomePage() {
                   type="submit"
                   className="w-full sm:w-auto bg-white hover:bg-slate-50 text-[#3b42c4] font-black px-6 py-3 rounded-xl transition-all shadow-md text-sm shrink-0 cursor-pointer"
                 >
-                  Join Now
+                  Subscribe
                 </button>
               </form>
             )}
