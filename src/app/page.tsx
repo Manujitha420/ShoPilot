@@ -434,238 +434,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Today's Deals (Flash Sale) Section */}
-      <section className="py-16 bg-slate-50 border-t border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-            <div>
-              <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-600 font-extrabold text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-md mb-2">
-                <Flame className="w-3.5 h-3.5 fill-current animate-pulse" />
-                <span>Flash Sale</span>
-              </span>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Today's Deals</h2>
-              <p className="text-sm text-slate-500 mt-1">Limited-time offers curated with AI precision. Grab them before they're gone!</p>
-            </div>
-
-            {/* Countdown timer UI */}
-            <div className="flex items-center gap-3 bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-2xl shrink-0">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-rose-500" />
-                <span>Ends In</span>
-              </span>
-              <div className="flex items-center gap-1 text-slate-900 font-black text-sm select-none">
-                <span className="bg-slate-100 px-2.5 py-1 rounded-lg w-[38px] text-center">{String(timeLeft.hours).padStart(2, '0')}</span>
-                <span>:</span>
-                <span className="bg-slate-100 px-2.5 py-1 rounded-lg w-[38px] text-center">{String(timeLeft.minutes).padStart(2, '0')}</span>
-                <span>:</span>
-                <span className="bg-slate-100 px-2.5 py-1 rounded-lg w-[38px] text-center text-rose-600 animate-pulse">{String(timeLeft.seconds).padStart(2, '0')}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {todayDeals.map((deal) => {
-              const isFav = isFavorite(deal.id);
-              return (
-                <div
-                  key={deal.id}
-                  className="bg-white border border-slate-200/60 rounded-3xl p-5 flex flex-col relative group transition-all duration-300 hover:shadow-md shadow-sm"
-                >
-                  {/* Discount percentage tag */}
-                  <span className="absolute top-6 left-6 bg-rose-500 text-white font-extrabold text-[10px] tracking-wide uppercase px-2.5 py-1 rounded-lg z-20">
-                    -{deal.discount}% Off
-                  </span>
-
-                  {/* Heart button */}
-                  <button
-                    onClick={(e) => handleFavoriteClick(deal.id, e)}
-                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${
-                      isFav
-                        ? 'bg-rose-50 border-rose-200 text-rose-500'
-                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
-                    }`}
-                  >
-                    <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
-                  </button>
-
-                  {/* Image container */}
-                  <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 mb-5 border border-slate-100 relative">
-                    <img
-                      src={deal.image}
-                      alt={deal.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-
-                  {/* Meta: Category & rating */}
-                  <div className="flex items-center justify-between text-[11px] mb-2 font-bold">
-                    <span className="text-slate-400 uppercase tracking-wider">{deal.category}</span>
-                    <div className="flex items-center gap-1 text-amber-500">
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                      <span>{deal.rating.toFixed(1)}</span>
-                    </div>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-sm font-bold text-slate-800 line-clamp-1 mb-2">
-                    {deal.title}
-                  </h3>
-
-                  {/* Claimed progress bar */}
-                  <div className="space-y-1.5 mb-4 mt-1">
-                    <div className="flex justify-between text-[10px] font-bold text-slate-400">
-                      <span>Limited Offers</span>
-                      <span className="text-slate-600 font-extrabold">{deal.claimed}% claimed</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-rose-500 rounded-full transition-all duration-500"
-                        style={{ width: `${deal.claimed}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Price and Cart */}
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Flash Price</span>
-                      <div className="flex items-baseline gap-1.5 mt-0.5">
-                        <span className="text-lg font-black text-rose-600">${deal.price.toFixed(2)}</span>
-                        <span className="text-slate-400 line-through text-xs font-semibold">${deal.originalPrice.toFixed(2)}</span>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={handleAddToCart}
-                      className="p-3 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-2xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
-                    >
-                      <ShoppingCart className="w-4.5 h-4.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* AI Recommendation Section (AI Smart Picks) */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-4">
-            <div>
-              <span className="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 text-[#3b42c4] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
-                <Sparkles className="w-3.5 h-3.5 fill-current" />
-                <span>Recommended For You</span>
-              </span>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">AI Recommendation Dashboard</h2>
-              <p className="text-sm text-slate-500 mt-1">Smart personalization matching your exact shopping style and interests.</p>
-            </div>
-
-            {/* Sub-tabs selection */}
-            <div className="flex flex-wrap items-center gap-1.5 bg-slate-50 border border-slate-200/60 p-1.5 rounded-2xl overflow-x-auto scrollbar-none">
-              {(['recommended', 'trending', 'interests', 'recent', 'continue', 'featured'] as const).map((tab) => {
-                const labels: Record<string, string> = {
-                  recommended: 'For You',
-                  trending: 'Trending',
-                  interests: 'Interests',
-                  recent: 'Recent',
-                  continue: 'Continue',
-                  featured: 'Featured'
-                };
-                const active = activeAiTab === tab;
-                return (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveAiTab(tab)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer whitespace-nowrap ${
-                      active
-                        ? 'bg-white border border-slate-200 shadow-sm text-[#3b42c4]'
-                        : 'text-slate-500 hover:text-slate-800'
-                    }`}
-                  >
-                    {labels[tab]}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {aiRecommendedTabs[activeAiTab].map((p) => {
-              const isFav = isFavorite(p.id);
-              return (
-                <div
-                  key={p.id}
-                  className="bg-white border border-slate-200/60 rounded-3xl p-5 flex flex-col relative group transition-all duration-300 hover:shadow-md shadow-sm"
-                >
-                  {/* AI Match Score Badge */}
-                  <span className="absolute top-6 left-6 bg-emerald-50 border border-emerald-100 text-emerald-600 font-extrabold text-[10px] tracking-wide uppercase px-2.5 py-1 rounded-xl z-20 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 fill-current text-emerald-500" />
-                    <span>{p.matchScore}% Match</span>
-                  </span>
-
-                  {/* Heart button */}
-                  <button
-                    onClick={(e) => handleFavoriteClick(p.id, e)}
-                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${
-                      isFav
-                        ? 'bg-rose-50 border-rose-200 text-rose-500'
-                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
-                    }`}
-                  >
-                    <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
-                  </button>
-
-                  {/* Image container */}
-                  <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 mb-5 border border-slate-100 relative">
-                    <img
-                      src={p.image}
-                      alt={p.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-
-                  {/* Meta: Category & rating */}
-                  <div className="flex items-center justify-between text-[11px] mb-2 font-bold">
-                    <span className="text-slate-400 uppercase tracking-wider">{p.category}</span>
-                    <div className="flex items-center gap-1 text-amber-500">
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                      <span>{p.rating.toFixed(1)}</span>
-                    </div>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-sm font-bold text-slate-800 line-clamp-1 mb-4">
-                    {p.title}
-                  </h3>
-
-                  {/* Price and Cart */}
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Price</span>
-                      <span className="text-lg font-black text-slate-900 mt-0.5">${p.price.toFixed(2)}</span>
-                    </div>
-
-                    <button
-                      onClick={handleAddToCart}
-                      className="p-3 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-2xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
-                    >
-                      <ShoppingCart className="w-4.5 h-4.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-        </div>
-      </section>
-
       {/* Category Section */}
-      <section id="categories" className="py-16 bg-white border-t border-slate-50">
+      <section id="categories" className="py-16 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="flex items-end justify-between mb-8">
@@ -851,6 +621,236 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Today's Deals (Flash Sale) Section */}
+      <section className="py-16 bg-slate-50 border-t border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+              <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-600 font-extrabold text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-md mb-2">
+                <Flame className="w-3.5 h-3.5 fill-current animate-pulse" />
+                <span>Flash Sale</span>
+              </span>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Today's Deals</h2>
+              <p className="text-sm text-slate-500 mt-1">Limited-time offers curated with AI precision. Grab them before they're gone!</p>
+            </div>
+
+            {/* Countdown timer UI */}
+            <div className="flex items-center gap-3 bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-2xl shrink-0">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-rose-500" />
+                <span>Ends In</span>
+              </span>
+              <div className="flex items-center gap-1 text-slate-900 font-black text-sm select-none">
+                <span className="bg-slate-100 px-2.5 py-1 rounded-lg w-[38px] text-center">{String(timeLeft.hours).padStart(2, '0')}</span>
+                <span>:</span>
+                <span className="bg-slate-100 px-2.5 py-1 rounded-lg w-[38px] text-center">{String(timeLeft.minutes).padStart(2, '0')}</span>
+                <span>:</span>
+                <span className="bg-slate-100 px-2.5 py-1 rounded-lg w-[38px] text-center text-rose-600 animate-pulse">{String(timeLeft.seconds).padStart(2, '0')}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {todayDeals.map((deal) => {
+              const isFav = isFavorite(deal.id);
+              return (
+                <div
+                  key={deal.id}
+                  className="bg-white border border-slate-200/60 rounded-3xl p-5 flex flex-col relative group transition-all duration-300 hover:shadow-md shadow-sm"
+                >
+                  {/* Discount percentage tag */}
+                  <span className="absolute top-6 left-6 bg-rose-500 text-white font-extrabold text-[10px] tracking-wide uppercase px-2.5 py-1 rounded-lg z-20">
+                    -{deal.discount}% Off
+                  </span>
+
+                  {/* Heart button */}
+                  <button
+                    onClick={(e) => handleFavoriteClick(deal.id, e)}
+                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${
+                      isFav
+                        ? 'bg-rose-50 border-rose-200 text-rose-500'
+                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
+                    }`}
+                  >
+                    <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
+                  </button>
+
+                  {/* Image container */}
+                  <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 mb-5 border border-slate-100 relative">
+                    <img
+                      src={deal.image}
+                      alt={deal.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+
+                  {/* Meta: Category & rating */}
+                  <div className="flex items-center justify-between text-[11px] mb-2 font-bold">
+                    <span className="text-slate-400 uppercase tracking-wider">{deal.category}</span>
+                    <div className="flex items-center gap-1 text-amber-500">
+                      <Star className="w-3.5 h-3.5 fill-current" />
+                      <span>{deal.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-sm font-bold text-slate-800 line-clamp-1 mb-2">
+                    {deal.title}
+                  </h3>
+
+                  {/* Claimed progress bar */}
+                  <div className="space-y-1.5 mb-4 mt-1">
+                    <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                      <span>Limited Offers</span>
+                      <span className="text-slate-600 font-extrabold">{deal.claimed}% claimed</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-rose-500 rounded-full transition-all duration-500"
+                        style={{ width: `${deal.claimed}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Price and Cart */}
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Flash Price</span>
+                      <div className="flex items-baseline gap-1.5 mt-0.5">
+                        <span className="text-lg font-black text-rose-600">${deal.price.toFixed(2)}</span>
+                        <span className="text-slate-400 line-through text-xs font-semibold">${deal.originalPrice.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleAddToCart}
+                      className="p-3 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-2xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
+                    >
+                      <ShoppingCart className="w-4.5 h-4.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* AI Recommendation Section (AI Smart Picks) */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-4">
+            <div>
+              <span className="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 text-[#3b42c4] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
+                <Sparkles className="w-3.5 h-3.5 fill-current" />
+                <span>Recommended For You</span>
+              </span>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">AI Recommendation Dashboard</h2>
+              <p className="text-sm text-slate-500 mt-1">Smart personalization matching your exact shopping style and interests.</p>
+            </div>
+
+            {/* Sub-tabs selection */}
+            <div className="flex flex-wrap items-center gap-1.5 bg-slate-50 border border-slate-200/60 p-1.5 rounded-2xl overflow-x-auto scrollbar-none">
+              {(['recommended', 'trending', 'interests', 'recent', 'continue', 'featured'] as const).map((tab) => {
+                const labels: Record<string, string> = {
+                  recommended: 'For You',
+                  trending: 'Trending',
+                  interests: 'Interests',
+                  recent: 'Recent',
+                  continue: 'Continue',
+                  featured: 'Featured'
+                };
+                const active = activeAiTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveAiTab(tab)}
+                    className={`px-4 py-2 text-xs font-bold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                      active
+                        ? 'bg-white border border-slate-200 shadow-sm text-[#3b42c4]'
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    {labels[tab]}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {aiRecommendedTabs[activeAiTab].map((p) => {
+              const isFav = isFavorite(p.id);
+              return (
+                <div
+                  key={p.id}
+                  className="bg-white border border-slate-200/60 rounded-3xl p-5 flex flex-col relative group transition-all duration-300 hover:shadow-md shadow-sm"
+                >
+                  {/* AI Match Score Badge */}
+                  <span className="absolute top-6 left-6 bg-emerald-50 border border-emerald-100 text-emerald-600 font-extrabold text-[10px] tracking-wide uppercase px-2.5 py-1 rounded-xl z-20 flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 fill-current text-emerald-500" />
+                    <span>{p.matchScore}% Match</span>
+                  </span>
+
+                  {/* Heart button */}
+                  <button
+                    onClick={(e) => handleFavoriteClick(p.id, e)}
+                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${
+                      isFav
+                        ? 'bg-rose-50 border-rose-200 text-rose-500'
+                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
+                    }`}
+                  >
+                    <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
+                  </button>
+
+                  {/* Image container */}
+                  <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 mb-5 border border-slate-100 relative">
+                    <img
+                      src={p.image}
+                      alt={p.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+
+                  {/* Meta: Category & rating */}
+                  <div className="flex items-center justify-between text-[11px] mb-2 font-bold">
+                    <span className="text-slate-400 uppercase tracking-wider">{p.category}</span>
+                    <div className="flex items-center gap-1 text-amber-500">
+                      <Star className="w-3.5 h-3.5 fill-current" />
+                      <span>{p.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-sm font-bold text-slate-800 line-clamp-1 mb-4">
+                    {p.title}
+                  </h3>
+
+                  {/* Price and Cart */}
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Price</span>
+                      <span className="text-lg font-black text-slate-900 mt-0.5">${p.price.toFixed(2)}</span>
+                    </div>
+
+                    <button
+                      onClick={handleAddToCart}
+                      className="p-3 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-2xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
+                    >
+                      <ShoppingCart className="w-4.5 h-4.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
       {/* AI Powered Features Section */}
       <section className="py-16 bg-[#f4f7fe]/40 border-t border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -909,92 +909,6 @@ export default function HomePage() {
               </p>
               <div className="absolute bottom-0 inset-x-0 h-1 bg-blue-500" />
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trending Now Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="text-2xl font-black tracking-tight text-slate-900">
-                Trending Now
-              </h2>
-              <p className="text-sm text-slate-500 mt-1">
-                Real-time popular products tailored for you.
-              </p>
-            </div>
-
-            {/* Slider arrows */}
-            <div className="flex items-center gap-2">
-              <button className="p-2 border border-slate-200 rounded-full hover:bg-slate-50 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
-                <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
-              </button>
-              <button className="p-2 border border-slate-200 rounded-full hover:bg-slate-50 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
-                <ChevronRight className="w-4 h-4 stroke-[2.5]" />
-              </button>
-            </div>
-          </div>
-
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {trendingProducts.map((p) => {
-              const isFav = isFavorite(p.id);
-              return (
-                <div
-                  key={p.id}
-                  className="bg-white border border-slate-200/60 rounded-[20px] p-4 flex flex-col relative group transition-all duration-300 hover:shadow-md"
-                >
-                  {/* Heart button */}
-                  <button
-                    onClick={(e) => handleFavoriteClick(p.id, e)}
-                    className={`absolute top-6 right-6 p-2 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${isFav
-                        ? 'bg-rose-50 border-rose-200 text-rose-500'
-                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
-                      }`}
-                  >
-                    <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
-                  </button>
-
-                  {/* Image container */}
-                  <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-50 mb-4 border border-slate-100">
-                    <img
-                      src={p.image}
-                      alt={p.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-
-                  {/* Meta: Category & rating */}
-                  <div className="flex items-center justify-between text-[11px] mb-2">
-                    <span className="text-slate-400 font-bold uppercase tracking-wider">{p.category}</span>
-                    <div className="flex items-center gap-1 text-amber-500">
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                      <span className="font-extrabold">{p.rating.toFixed(1)}</span>
-                    </div>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-sm font-bold text-slate-800 line-clamp-1 mb-3">
-                    {p.title}
-                  </h3>
-
-                  {/* Price and Cart */}
-                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
-                    <span className="text-base font-black text-slate-900">${p.price.toFixed(2)}</span>
-
-                    <button
-                      onClick={handleAddToCart}
-                      className="p-2.5 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       </section>
