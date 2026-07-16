@@ -363,10 +363,225 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden py-16 md:py-24 bg-white text-center">
-        {/* Soft background glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-50/40 rounded-full blur-3xl -z-10 pointer-events-none" />
+        <style>{`
+          @keyframes float-a {
+            0%, 100% { transform: translateY(0px) rotate(-3deg); }
+            50%       { transform: translateY(-14px) rotate(-1.5deg); }
+          }
+          @keyframes float-b {
+            0%, 100% { transform: translateY(0px) rotate(2deg); }
+            50%       { transform: translateY(-10px) rotate(3.5deg); }
+          }
+          @keyframes float-c {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50%       { transform: translateY(-16px) rotate(-0.5deg); }
+          }
+          @keyframes float-d {
+            0%, 100% { transform: translateY(0px) rotate(4deg); }
+            50%       { transform: translateY(-12px) rotate(2.5deg); }
+          }
+          @keyframes float-e {
+            0%, 100% { transform: translateY(0px) rotate(-1deg); }
+            50%       { transform: translateY(-18px) rotate(1deg); }
+          }
+          @keyframes float-f {
+            0%, 100% { transform: translateY(0px) rotate(3.5deg); }
+            50%       { transform: translateY(-10px) rotate(5deg); }
+          }
+          @keyframes float-chip {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-8px); }
+          }
+          .flt-a { animation: float-a 6s ease-in-out infinite; }
+          .flt-b { animation: float-b 7.5s ease-in-out infinite; }
+          .flt-c { animation: float-c 5.5s ease-in-out infinite; }
+          .flt-d { animation: float-d 8s ease-in-out infinite; }
+          .flt-e { animation: float-e 6.5s ease-in-out infinite; }
+          .flt-f { animation: float-f 9s ease-in-out infinite; }
+          .flt-chip { animation: float-chip 4s ease-in-out infinite; }
+          .flt-chip2 { animation: float-chip 5s ease-in-out infinite 0.8s; }
+          .flt-chip3 { animation: float-chip 6s ease-in-out infinite 0.3s; }
+          @keyframes float-g {
+            0%, 100% { transform: translateY(0px) rotate(1.5deg); }
+            50%       { transform: translateY(-13px) rotate(-1deg); }
+          }
+          @keyframes float-h {
+            0%, 100% { transform: translateY(0px) rotate(-2.5deg); }
+            50%       { transform: translateY(-9px) rotate(0.5deg); }
+          }
+          .flt-g { animation: float-g 7s ease-in-out infinite 1.2s; }
+          .flt-h { animation: float-h 5.8s ease-in-out infinite 0.5s; }
+          .flt-chip4 { animation: float-chip 4.5s ease-in-out infinite 1.5s; }
+          .flt-chip5 { animation: float-chip 5.5s ease-in-out infinite 0.2s; }
+          .flt-chip6 { animation: float-chip 6.5s ease-in-out infinite 2s; }
+        `}</style>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        {/* Dot-grid background pattern */}
+        <div
+          className="absolute inset-0 -z-10 pointer-events-none opacity-[0.35]"
+          style={{ backgroundImage: 'radial-gradient(circle, #c7d2fe 1px, transparent 1px)', backgroundSize: '28px 28px' }}
+        />
+
+        {/* Soft background glow blobs */}
+        <div className="absolute top-0 left-1/4 w-[480px] h-[480px] bg-indigo-100/50 rounded-full blur-3xl -z-10 pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-rose-100/40 rounded-full blur-3xl -z-10 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] bg-purple-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
+
+
+        {/* ── FLOATING PROMO CARDS (scattered) ────────────────── */}
+
+        {/* Flash Sale — far left, vertically high */}
+        <div style={{top:'6%', left:'1%'}} className="hidden xl:block absolute w-64 bg-gradient-to-br from-rose-50 to-amber-50 border border-rose-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-a">
+          <div className="flex items-center gap-2 mb-2.5">
+            <span className="text-lg">🔥</span>
+            <span className="bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Flash Sale</span>
+          </div>
+          <h4 className="text-sm font-black text-slate-800 mb-1">Today Only</h4>
+          <p className="text-xs text-slate-500 font-semibold leading-snug">Up to <span className="text-rose-500 font-black">60% Off</span> smartphones &amp; wearables!</p>
+          <div className="mt-3 flex items-center gap-2">
+            <span className="text-xs line-through text-slate-400 font-semibold">$299</span>
+            <span className="text-base font-black text-rose-500">$119</span>
+          </div>
+        </div>
+
+        {/* AI Smart Picks — slightly inset left, lower-middle */}
+        <div style={{top:'52%', left:'3%'}} className="hidden lg:block absolute w-64 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-c">
+          <span className="inline-block bg-[#3b42c4] text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md mb-2.5">Summer Deal</span>
+          <h4 className="text-sm font-black text-slate-800 mb-1">AI Smart Picks</h4>
+          <p className="text-xs text-slate-500 font-semibold leading-snug">Up to <span className="text-[#3b42c4] font-black">40% Off</span> curated tech &amp; accessories.</p>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="flex -space-x-2">
+              {['https://i.pravatar.cc/32?img=1','https://i.pravatar.cc/32?img=2','https://i.pravatar.cc/32?img=3'].map((src,i) => (
+                <img key={i} src={src} className="w-6 h-6 rounded-full border-2 border-white object-cover" alt="" />
+              ))}
+            </div>
+            <span className="text-[11px] text-slate-400 font-bold">+2.4k shopping</span>
+          </div>
+        </div>
+
+        {/* Free Shipping — bottom-left, pushed in a bit */}
+        <div style={{bottom:'4%', left:'7%'}} className="hidden xl:block absolute w-64 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-e">
+          <div className="flex items-center gap-2 mb-2.5">
+            <span className="text-lg">📦</span>
+            <span className="bg-emerald-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Free Ship</span>
+          </div>
+          <h4 className="text-sm font-black text-slate-800 mb-1">Express Delivery</h4>
+          <p className="text-xs text-slate-500 font-semibold leading-snug">Free express shipping on orders over <span className="text-emerald-600 font-black">$100</span> — no code needed.</p>
+        </div>
+
+        {/* New Arrival — right side, sits near top-right corner */}
+        <div style={{top:'3%', right:'2%'}} className="hidden xl:block absolute w-64 bg-gradient-to-bl from-purple-50 to-indigo-50 border border-purple-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-b">
+          <div className="flex items-center gap-2 mb-2.5">
+            <span className="text-lg">✨</span>
+            <span className="bg-purple-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">New Arrival</span>
+          </div>
+          <h4 className="text-sm font-black text-slate-800 mb-1">Just Dropped</h4>
+          <p className="text-xs text-slate-500 font-semibold leading-snug">Freshest picks added this week — AI-curated and ready to ship.</p>
+          <div className="mt-3 w-full bg-purple-100 rounded-full h-2 overflow-hidden">
+            <div className="bg-purple-500 h-full w-4/5 rounded-full" />
+          </div>
+          <p className="text-[11px] text-purple-500 font-black mt-1">80% claimed</p>
+        </div>
+
+        {/* Precision Match — right, lower-mid, offset inward */}
+        <div style={{top:'44%', right:'1%'}} className="hidden lg:block absolute w-64 bg-gradient-to-bl from-rose-50 to-orange-50 border border-rose-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-d">
+          <span className="inline-block bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md mb-2.5">AI Match</span>
+          <h4 className="text-sm font-black text-slate-800 mb-1">Precision Match</h4>
+          <p className="text-xs text-slate-500 font-semibold leading-snug">Chat with AI to unlock personalised discount codes instantly.</p>
+          <div className="mt-3 flex items-center justify-between">
+            <span className="text-[11px] font-bold text-slate-400">Match score</span>
+            <span className="text-base font-black text-rose-500">96%</span>
+          </div>
+          <div className="w-full bg-rose-100 rounded-full h-2 mt-1 overflow-hidden">
+            <div className="bg-rose-500 h-full rounded-full" style={{width:'96%'}} />
+          </div>
+        </div>
+
+        {/* Top Rated — bottom-right, with a slight inward push */}
+        <div style={{bottom:'5%', right:'4%'}} className="hidden xl:block absolute w-64 bg-gradient-to-bl from-amber-50 to-yellow-50 border border-amber-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-f">
+          <div className="flex items-center gap-2 mb-2.5">
+            <span className="text-lg">⭐</span>
+            <span className="bg-amber-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Top Rated</span>
+          </div>
+          <h4 className="text-sm font-black text-slate-800 mb-1">Loved by Shoppers</h4>
+          <p className="text-xs text-slate-500 font-semibold leading-snug">4.9 ★ average — join <span className="text-amber-600 font-black">500K+</span> happy AI shoppers worldwide.</p>
+        </div>
+
+        {/* ── FLOATING STAT CHIPS (scattered) ─────────────────── */}
+        <div style={{top:'28%', left:'9%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip pointer-events-none">
+          <span className="text-[10px]">🛒</span>
+          <span className="text-[10px] font-black text-slate-700">1,248 sold today</span>
+        </div>
+        <div style={{top:'18%', right:'9%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip2 pointer-events-none">
+          <span className="text-[10px]">🤖</span>
+          <span className="text-[10px] font-black text-slate-700">AI found 3 better deals</span>
+        </div>
+        <div style={{bottom:'25%', right:'10%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip3 pointer-events-none">
+          <span className="text-[10px]">⚡</span>
+          <span className="text-[10px] font-black text-slate-700">Code AISHOP20 active</span>
+        </div>
+
+        {/* ── MIDDLE ZONE CARDS ─────────────────────────────── */}
+
+        {/* Trending Deal — upper-left middle */}
+        <div style={{top:'5%', left:'22%'}} className="hidden 2xl:block absolute w-60 bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-g">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">📈</span>
+            <span className="bg-sky-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Trending</span>
+          </div>
+          <h4 className="text-sm font-black text-slate-800 mb-1">Hot Right Now</h4>
+          <p className="text-xs text-slate-500 font-semibold leading-snug">2,310 people viewing this deal right now.</p>
+          <div className="mt-2.5 flex items-center gap-1">
+            {'★★★★★'.split('').map((s,i) => <span key={i} className="text-amber-400 text-xs">{s}</span>)}
+            <span className="text-[11px] text-slate-400 ml-0.5 font-bold">4.9</span>
+          </div>
+        </div>
+
+        {/* AI Cashback — upper-right middle */}
+        <div style={{top:'7%', right:'22%'}} className="hidden 2xl:block absolute w-60 bg-gradient-to-bl from-violet-50 to-fuchsia-50 border border-violet-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-h">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">💸</span>
+            <span className="bg-violet-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Cashback</span>
+          </div>
+          <h4 className="text-sm font-black text-slate-800 mb-1">Earn While You Shop</h4>
+          <p className="text-xs text-slate-500 font-semibold leading-snug">Get up to <span className="text-violet-600 font-black">12% cashback</span> on every AI-matched purchase.</p>
+        </div>
+
+        {/* Price Drop — lower-left middle */}
+        <div style={{bottom:'7%', left:'20%'}} className="hidden 2xl:block absolute w-56 bg-gradient-to-br from-lime-50 to-green-50 border border-lime-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-c">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">🏷️</span>
+            <span className="bg-lime-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Price Drop</span>
+          </div>
+          <h4 className="text-sm font-black text-slate-800 mb-1">Just Dropped</h4>
+          <p className="text-xs text-slate-500 font-semibold leading-snug">Price fell <span className="text-lime-600 font-black">$34</span> in the last hour.</p>
+        </div>
+
+        {/* Loyalty Points — lower-right middle */}
+        <div style={{bottom:'6%', right:'21%'}} className="hidden 2xl:block absolute w-60 bg-gradient-to-bl from-pink-50 to-rose-50 border border-pink-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-e">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">🎁</span>
+            <span className="bg-pink-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Rewards</span>
+          </div>
+          <h4 className="text-sm font-black text-slate-800 mb-1">Loyalty Points</h4>
+          <p className="text-xs text-slate-500 font-semibold leading-snug">Earn <span className="text-pink-600 font-black">3×</span> points on AI-curated picks this weekend.</p>
+        </div>
+
+        {/* ── MIDDLE ZONE CHIPS ─────────────────────────────── */}
+        <div style={{top:'38%', left:'18%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip4 pointer-events-none">
+          <span className="text-[10px]">🔔</span>
+          <span className="text-[10px] font-black text-slate-700">Price alert set</span>
+        </div>
+        <div style={{top:'62%', left:'22%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip5 pointer-events-none">
+          <span className="text-[10px]">💚</span>
+          <span className="text-[10px] font-black text-slate-700">Eco-friendly pick</span>
+        </div>
+        <div style={{top:'55%', right:'19%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip6 pointer-events-none">
+          <span className="text-[10px]">🚀</span>
+          <span className="text-[10px] font-black text-slate-700">Ships in 2 hrs</span>
+        </div>
+
+        <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-1 bg-[#eef2ff] text-[#3b42c4] font-extrabold text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full mb-6">
             <span className="text-[12px] leading-none select-none">✦</span>
