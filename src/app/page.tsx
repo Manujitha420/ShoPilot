@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 
 // ─── Floating AI Chat Popup Component ───────────────────────────────────────
-interface ChatMsg { id: string; role: 'user'|'assistant'; content: string; products?: any[]; isError?: boolean; }
+interface ChatMsg { id: string; role: 'user' | 'assistant'; content: string; products?: any[]; isError?: boolean; }
 
 const POPUP_PRESETS = [
   'Recommend a laptop for programming',
@@ -84,66 +84,64 @@ function AIChatPopup() {
     <>
       {/* Chat Panel */}
       <div
-        className={`fixed bottom-24 right-6 z-50 w-[370px] max-w-[calc(100vw-2rem)] bg-slate-950 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right ${
-          chatOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'
-        }`}
+        className={`fixed bottom-24 right-24 z-50 w-[370px] max-w-[calc(100vw-6rem)] bg-white border border-slate-200 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right ${chatOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'
+          }`}
         style={{ height: 520 }}
       >
         {/* Header */}
-        <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0">
+        <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white">
               <Sparkles className="w-4 h-4 animate-pulse" />
             </div>
             <div>
-              <p className="font-bold text-white text-sm leading-none">ShoPilot AI</p>
-              <span className="flex items-center gap-1 text-[10px] text-emerald-400 mt-0.5 font-semibold">
+              <p className="font-bold text-slate-800 text-sm leading-none">ShoPilot AI</p>
+              <span className="flex items-center gap-1 text-[10px] text-emerald-600 mt-0.5 font-semibold">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
                 Online &middot; Llama 3.3 70B
               </span>
             </div>
           </div>
           <button id="chat-popup-close-btn" onClick={() => setChatOpen(false)}
-            className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            className="w-7 h-7 rounded-lg bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></svg>
           </button>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-none">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-none bg-slate-50/50">
           {chatMessages.map(msg => {
             const isUser = msg.role === 'user';
             return (
               <div key={msg.id} className={`flex items-end gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}>
                 {!isUser && (
-                  <div className="w-7 h-7 rounded-lg bg-indigo-950 border border-indigo-900/60 flex items-center justify-center text-indigo-400 shrink-0">
+                  <div className="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
                     <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/>
-                      <path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="16" y1="16" x2="16" y2="16.01"/>
+                      <rect x="3" y="11" width="18" height="10" rx="2" /><circle cx="12" cy="5" r="2" />
+                      <path d="M12 7v4" /><line x1="8" y1="16" x2="8" y2="16.01" /><line x1="16" y1="16" x2="16" y2="16.01" />
                     </svg>
                   </div>
                 )}
                 <div className={`max-w-[80%] flex flex-col gap-2 ${isUser ? 'items-end' : 'items-start'}`}>
-                  <div className={`px-4 py-2.5 rounded-2xl text-xs leading-relaxed border ${
-                    isUser ? 'bg-indigo-600 border-indigo-500 text-white rounded-br-sm'
-                    : msg.isError ? 'bg-red-950/20 border-red-900/50 text-red-300 rounded-bl-sm'
-                    : 'bg-slate-900 border-slate-800 text-slate-200 rounded-bl-sm'
-                  }`}>{msg.content}</div>
+                  <div className={`px-4 py-2.5 rounded-2xl text-xs leading-relaxed border ${isUser ? 'bg-indigo-600 border-indigo-500 text-white rounded-br-sm shadow-sm'
+                    : msg.isError ? 'bg-red-50 border-red-200 text-red-700 rounded-bl-sm'
+                      : 'bg-white border-slate-200 text-slate-700 rounded-bl-sm shadow-sm'
+                    }`}>{msg.content}</div>
                   {!isUser && msg.products && msg.products.length > 0 && (
                     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none w-full max-w-full">
                       {msg.products.slice(0, 4).map((p: any) => (
-                        <a key={p.id} href={`/products/${p.id}`} className="shrink-0 w-28 bg-slate-900 border border-slate-800 rounded-xl p-2 hover:border-indigo-500/50 transition-all group">
+                        <a key={p.id} href={`/products/${p.id}`} className="shrink-0 w-28 bg-white border border-slate-200 rounded-xl p-2 hover:border-indigo-500/50 hover:shadow-sm transition-all group">
                           <img src={p.thumbnail} alt={p.title} className="w-full h-16 object-cover rounded-lg mb-1.5 group-hover:scale-105 transition-transform" />
-                          <p className="text-[10px] font-bold text-slate-200 truncate">{p.title}</p>
-                          <p className="text-[10px] font-black text-indigo-400 mt-0.5">${p.price?.toFixed(2)}</p>
+                          <p className="text-[10px] font-bold text-slate-800 truncate">{p.title}</p>
+                          <p className="text-[10px] font-black text-indigo-600 mt-0.5">${p.price?.toFixed(2)}</p>
                         </a>
                       ))}
                     </div>
                   )}
                 </div>
                 {isUser && (
-                  <div className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 shrink-0">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  <div className="w-7 h-7 rounded-lg bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-600 shrink-0">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" /></svg>
                   </div>
                 )}
               </div>
@@ -151,15 +149,15 @@ function AIChatPopup() {
           })}
           {chatLoading && (
             <div className="flex items-end gap-2.5 justify-start">
-              <div className="w-7 h-7 rounded-lg bg-indigo-950 border border-indigo-900/60 flex items-center justify-center text-indigo-400 shrink-0 animate-pulse">
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0 animate-pulse">
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/>
+                  <rect x="3" y="11" width="18" height="10" rx="2" /><circle cx="12" cy="5" r="2" /><path d="M12 7v4" />
                 </svg>
               </div>
-              <div className="px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl rounded-bl-sm flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{animationDelay:'0ms'}} />
-                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{animationDelay:'150ms'}} />
-                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{animationDelay:'300ms'}} />
+              <div className="px-4 py-2.5 bg-white border border-slate-200 rounded-2xl rounded-bl-sm flex items-center gap-1 shadow-sm">
+                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           )}
@@ -168,10 +166,10 @@ function AIChatPopup() {
 
         {/* Preset chips */}
         {chatMessages.length === 1 && (
-          <div className="px-4 pb-2 flex flex-wrap gap-1.5 shrink-0">
+          <div className="px-4 pb-3 flex flex-wrap gap-1.5 shrink-0 bg-slate-50/50">
             {POPUP_PRESETS.map((p, i) => (
               <button key={i} onClick={() => sendChat(p)}
-                className="text-[10px] px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 rounded-lg transition-all cursor-pointer font-medium">
+                className="text-[10px] px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-950 rounded-lg transition-all cursor-pointer font-semibold shadow-sm">
                 {p}
               </button>
             ))}
@@ -180,14 +178,14 @@ function AIChatPopup() {
 
         {/* Input bar */}
         <form onSubmit={e => { e.preventDefault(); sendChat(chatInput); }}
-          className="p-3 border-t border-slate-800 flex gap-2 items-center shrink-0 bg-slate-900/60">
+          className="p-3 border-t border-slate-200 flex gap-2 items-center shrink-0 bg-white">
           <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)}
             disabled={chatLoading} placeholder="Ask me anything about products..."
-            className="flex-1 bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-200 rounded-xl px-4 py-2.5 outline-none text-xs disabled:opacity-50 placeholder-slate-600 transition-all"
+            className="flex-1 bg-slate-50 border border-slate-200 focus:border-indigo-500 text-slate-800 rounded-xl px-4 py-2.5 outline-none text-xs disabled:opacity-50 placeholder-slate-400 transition-all focus:bg-white"
           />
           <button type="submit" disabled={chatLoading || !chatInput.trim()}
-            className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 text-white disabled:text-slate-600 rounded-xl transition-all cursor-pointer disabled:cursor-not-allowed shrink-0">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
+            className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-100 text-white disabled:text-slate-400 rounded-xl transition-all cursor-pointer disabled:cursor-not-allowed shrink-0 shadow-sm">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M22 2 11 13" /><path d="M22 2 15 22 11 13 2 9l20-7z" /></svg>
           </button>
         </form>
       </div>
@@ -195,17 +193,21 @@ function AIChatPopup() {
       {/* FAB toggle */}
       <button id="chat-popup-toggle-btn" onClick={() => setChatOpen(o => !o)}
         title="Open AI Chat Assistant"
-        className={`fixed bottom-6 right-6 z-50 text-white p-4 rounded-full shadow-lg cursor-pointer hover:scale-105 transition-all flex items-center justify-center w-14 h-14 ${
-          chatOpen ? 'bg-slate-700 hover:bg-slate-600' : 'bg-black hover:bg-slate-900'
-        }`}
+        className={`fixed bottom-6 right-6 z-50 text-white rounded-full shadow-xl cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center w-14 h-14 group ${chatOpen ? 'bg-slate-700 hover:bg-slate-600 rotate-180' : 'bg-black hover:bg-slate-900'
+          }`}
       >
+        {/* Pulsing ambient glow behind button */}
+        {!chatOpen && (
+          <span className="absolute -inset-1 bg-black/10 rounded-full animate-ping -z-10 group-hover:bg-[#3b42c4]/20 transition-all duration-300" />
+        )}
+
         {chatOpen ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <svg className="w-6 h-6 transition-transform duration-300 group-hover:scale-90" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></svg>
         ) : (
-          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/>
-            <path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="16" y1="16" x2="16" y2="16.01"/>
-            <path d="M9 11v-2a3 3 0 0 1 6 0v2"/>
+          <svg className="w-7 h-7 transition-all duration-300 group-hover:rotate-12 group-hover:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2" /><circle cx="12" cy="5" r="2" />
+            <path d="M12 7v4" /><line x1="8" y1="16" x2="8" y2="16.01" /><line x1="16" y1="16" x2="16" y2="16.01" />
+            <path d="M9 11v-2a3 3 0 0 1 6 0v2" />
           </svg>
         )}
       </button>
@@ -641,156 +643,156 @@ export default function HomePage() {
           }}
         >
 
-        {/* Flash Sale — far left, vertically high */}
-        <div style={{top:'6%', left:'1%'}} className="hidden xl:block absolute w-64 bg-gradient-to-br from-rose-50 to-amber-50 border border-rose-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-a">
-          <div className="flex items-center gap-2 mb-2.5">
-            <span className="text-lg">🔥</span>
-            <span className="bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Flash Sale</span>
-          </div>
-          <h4 className="text-sm font-black text-slate-800 mb-1">Today Only</h4>
-          <p className="text-xs text-slate-500 font-semibold leading-snug">Up to <span className="text-rose-500 font-black">60% Off</span> smartphones &amp; wearables!</p>
-          <div className="mt-3 flex items-center gap-2">
-            <span className="text-xs line-through text-slate-400 font-semibold">$299</span>
-            <span className="text-base font-black text-rose-500">$119</span>
-          </div>
-        </div>
-
-        {/* AI Smart Picks — slightly inset left, lower-middle */}
-        <div style={{top:'52%', left:'3%'}} className="hidden lg:block absolute w-64 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-c">
-          <span className="inline-block bg-[#3b42c4] text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md mb-2.5">Summer Deal</span>
-          <h4 className="text-sm font-black text-slate-800 mb-1">AI Smart Picks</h4>
-          <p className="text-xs text-slate-500 font-semibold leading-snug">Up to <span className="text-[#3b42c4] font-black">40% Off</span> curated tech &amp; accessories.</p>
-          <div className="mt-3 flex items-center gap-2">
-            <div className="flex -space-x-2">
-              {['https://i.pravatar.cc/32?img=1','https://i.pravatar.cc/32?img=2','https://i.pravatar.cc/32?img=3'].map((src,i) => (
-                <img key={i} src={src} className="w-6 h-6 rounded-full border-2 border-white object-cover" alt="" />
-              ))}
+          {/* Flash Sale — far left, vertically high */}
+          <div style={{ top: '6%', left: '1%' }} className="hidden xl:block absolute w-64 bg-gradient-to-br from-rose-50 to-amber-50 border border-rose-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-a">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="text-lg">🔥</span>
+              <span className="bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Flash Sale</span>
             </div>
-            <span className="text-[11px] text-slate-400 font-bold">+2.4k shopping</span>
+            <h4 className="text-sm font-black text-slate-800 mb-1">Today Only</h4>
+            <p className="text-xs text-slate-500 font-semibold leading-snug">Up to <span className="text-rose-500 font-black">60% Off</span> smartphones &amp; wearables!</p>
+            <div className="mt-3 flex items-center gap-2">
+              <span className="text-xs line-through text-slate-400 font-semibold">$299</span>
+              <span className="text-base font-black text-rose-500">$119</span>
+            </div>
           </div>
-        </div>
 
-        {/* Free Shipping — bottom-left, pushed in a bit */}
-        <div style={{bottom:'4%', left:'7%'}} className="hidden xl:block absolute w-64 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-e">
-          <div className="flex items-center gap-2 mb-2.5">
-            <span className="text-lg">📦</span>
-            <span className="bg-emerald-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Free Ship</span>
+          {/* AI Smart Picks — slightly inset left, lower-middle */}
+          <div style={{ top: '52%', left: '3%' }} className="hidden lg:block absolute w-64 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-c">
+            <span className="inline-block bg-[#3b42c4] text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md mb-2.5">Summer Deal</span>
+            <h4 className="text-sm font-black text-slate-800 mb-1">AI Smart Picks</h4>
+            <p className="text-xs text-slate-500 font-semibold leading-snug">Up to <span className="text-[#3b42c4] font-black">40% Off</span> curated tech &amp; accessories.</p>
+            <div className="mt-3 flex items-center gap-2">
+              <div className="flex -space-x-2">
+                {['https://i.pravatar.cc/32?img=1', 'https://i.pravatar.cc/32?img=2', 'https://i.pravatar.cc/32?img=3'].map((src, i) => (
+                  <img key={i} src={src} className="w-6 h-6 rounded-full border-2 border-white object-cover" alt="" />
+                ))}
+              </div>
+              <span className="text-[11px] text-slate-400 font-bold">+2.4k shopping</span>
+            </div>
           </div>
-          <h4 className="text-sm font-black text-slate-800 mb-1">Express Delivery</h4>
-          <p className="text-xs text-slate-500 font-semibold leading-snug">Free express shipping on orders over <span className="text-emerald-600 font-black">$100</span> — no code needed.</p>
-        </div>
 
-        {/* New Arrival — right side, sits near top-right corner */}
-        <div style={{top:'3%', right:'2%'}} className="hidden xl:block absolute w-64 bg-gradient-to-bl from-purple-50 to-indigo-50 border border-purple-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-b">
-          <div className="flex items-center gap-2 mb-2.5">
-            <span className="text-lg">✨</span>
-            <span className="bg-purple-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">New Arrival</span>
+          {/* Free Shipping — bottom-left, pushed in a bit */}
+          <div style={{ bottom: '4%', left: '7%' }} className="hidden xl:block absolute w-64 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-e">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="text-lg">📦</span>
+              <span className="bg-emerald-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Free Ship</span>
+            </div>
+            <h4 className="text-sm font-black text-slate-800 mb-1">Express Delivery</h4>
+            <p className="text-xs text-slate-500 font-semibold leading-snug">Free express shipping on orders over <span className="text-emerald-600 font-black">$100</span> — no code needed.</p>
           </div>
-          <h4 className="text-sm font-black text-slate-800 mb-1">Just Dropped</h4>
-          <p className="text-xs text-slate-500 font-semibold leading-snug">Freshest picks added this week — AI-curated and ready to ship.</p>
-          <div className="mt-3 w-full bg-purple-100 rounded-full h-2 overflow-hidden">
-            <div className="bg-purple-500 h-full w-4/5 rounded-full" />
-          </div>
-          <p className="text-[11px] text-purple-500 font-black mt-1">80% claimed</p>
-        </div>
 
-        {/* Precision Match — right, lower-mid, offset inward */}
-        <div style={{top:'44%', right:'1%'}} className="hidden lg:block absolute w-64 bg-gradient-to-bl from-rose-50 to-orange-50 border border-rose-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-d">
-          <span className="inline-block bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md mb-2.5">AI Match</span>
-          <h4 className="text-sm font-black text-slate-800 mb-1">Precision Match</h4>
-          <p className="text-xs text-slate-500 font-semibold leading-snug">Chat with AI to unlock personalised discount codes instantly.</p>
-          <div className="mt-3 flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400">Match score</span>
-            <span className="text-base font-black text-rose-500">96%</span>
+          {/* New Arrival — right side, sits near top-right corner */}
+          <div style={{ top: '3%', right: '2%' }} className="hidden xl:block absolute w-64 bg-gradient-to-bl from-purple-50 to-indigo-50 border border-purple-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-b">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="text-lg">✨</span>
+              <span className="bg-purple-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">New Arrival</span>
+            </div>
+            <h4 className="text-sm font-black text-slate-800 mb-1">Just Dropped</h4>
+            <p className="text-xs text-slate-500 font-semibold leading-snug">Freshest picks added this week — AI-curated and ready to ship.</p>
+            <div className="mt-3 w-full bg-purple-100 rounded-full h-2 overflow-hidden">
+              <div className="bg-purple-500 h-full w-4/5 rounded-full" />
+            </div>
+            <p className="text-[11px] text-purple-500 font-black mt-1">80% claimed</p>
           </div>
-          <div className="w-full bg-rose-100 rounded-full h-2 mt-1 overflow-hidden">
-            <div className="bg-rose-500 h-full rounded-full" style={{width:'96%'}} />
+
+          {/* Precision Match — right, lower-mid, offset inward */}
+          <div style={{ top: '44%', right: '1%' }} className="hidden lg:block absolute w-64 bg-gradient-to-bl from-rose-50 to-orange-50 border border-rose-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-d">
+            <span className="inline-block bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md mb-2.5">AI Match</span>
+            <h4 className="text-sm font-black text-slate-800 mb-1">Precision Match</h4>
+            <p className="text-xs text-slate-500 font-semibold leading-snug">Chat with AI to unlock personalised discount codes instantly.</p>
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-[11px] font-bold text-slate-400">Match score</span>
+              <span className="text-base font-black text-rose-500">96%</span>
+            </div>
+            <div className="w-full bg-rose-100 rounded-full h-2 mt-1 overflow-hidden">
+              <div className="bg-rose-500 h-full rounded-full" style={{ width: '96%' }} />
+            </div>
           </div>
-        </div>
 
-        {/* Top Rated — bottom-right, with a slight inward push */}
-        <div style={{bottom:'5%', right:'4%'}} className="hidden xl:block absolute w-64 bg-gradient-to-bl from-amber-50 to-yellow-50 border border-amber-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-f">
-          <div className="flex items-center gap-2 mb-2.5">
-            <span className="text-lg">⭐</span>
-            <span className="bg-amber-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Top Rated</span>
+          {/* Top Rated — bottom-right, with a slight inward push */}
+          <div style={{ bottom: '5%', right: '4%' }} className="hidden xl:block absolute w-64 bg-gradient-to-bl from-amber-50 to-yellow-50 border border-amber-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-f">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="text-lg">⭐</span>
+              <span className="bg-amber-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Top Rated</span>
+            </div>
+            <h4 className="text-sm font-black text-slate-800 mb-1">Loved by Shoppers</h4>
+            <p className="text-xs text-slate-500 font-semibold leading-snug">4.9 ★ average — join <span className="text-amber-600 font-black">500K+</span> happy AI shoppers worldwide.</p>
           </div>
-          <h4 className="text-sm font-black text-slate-800 mb-1">Loved by Shoppers</h4>
-          <p className="text-xs text-slate-500 font-semibold leading-snug">4.9 ★ average — join <span className="text-amber-600 font-black">500K+</span> happy AI shoppers worldwide.</p>
-        </div>
 
-        {/* ── FLOATING STAT CHIPS (scattered) ─────────────────── */}
-        <div style={{top:'28%', left:'9%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip pointer-events-none">
-          <span className="text-[10px]">🛒</span>
-          <span className="text-[10px] font-black text-slate-700">1,248 sold today</span>
-        </div>
-        <div style={{top:'18%', right:'9%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip2 pointer-events-none">
-          <span className="text-[10px]">🤖</span>
-          <span className="text-[10px] font-black text-slate-700">AI found 3 better deals</span>
-        </div>
-        <div style={{bottom:'25%', right:'10%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip3 pointer-events-none">
-          <span className="text-[10px]">⚡</span>
-          <span className="text-[10px] font-black text-slate-700">Code AISHOP20 active</span>
-        </div>
-
-        {/* ── MIDDLE ZONE CARDS ─────────────────────────────── */}
-
-        {/* Trending Deal — upper-left middle */}
-        <div style={{top:'5%', left:'22%'}} className="hidden 2xl:block absolute w-60 bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-g">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">📈</span>
-            <span className="bg-sky-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Trending</span>
+          {/* ── FLOATING STAT CHIPS (scattered) ─────────────────── */}
+          <div style={{ top: '28%', left: '9%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip pointer-events-none">
+            <span className="text-[10px]">🛒</span>
+            <span className="text-[10px] font-black text-slate-700">1,248 sold today</span>
           </div>
-          <h4 className="text-sm font-black text-slate-800 mb-1">Hot Right Now</h4>
-          <p className="text-xs text-slate-500 font-semibold leading-snug">2,310 people viewing this deal right now.</p>
-          <div className="mt-2.5 flex items-center gap-1">
-            {'★★★★★'.split('').map((s,i) => <span key={i} className="text-amber-400 text-xs">{s}</span>)}
-            <span className="text-[11px] text-slate-400 ml-0.5 font-bold">4.9</span>
+          <div style={{ top: '18%', right: '9%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip2 pointer-events-none">
+            <span className="text-[10px]">🤖</span>
+            <span className="text-[10px] font-black text-slate-700">AI found 3 better deals</span>
           </div>
-        </div>
-
-        {/* AI Cashback — upper-right middle */}
-        <div style={{top:'7%', right:'22%'}} className="hidden 2xl:block absolute w-60 bg-gradient-to-bl from-violet-50 to-fuchsia-50 border border-violet-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-h">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">💸</span>
-            <span className="bg-violet-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Cashback</span>
+          <div style={{ bottom: '25%', right: '10%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip3 pointer-events-none">
+            <span className="text-[10px]">⚡</span>
+            <span className="text-[10px] font-black text-slate-700">Code AISHOP20 active</span>
           </div>
-          <h4 className="text-sm font-black text-slate-800 mb-1">Earn While You Shop</h4>
-          <p className="text-xs text-slate-500 font-semibold leading-snug">Get up to <span className="text-violet-600 font-black">12% cashback</span> on every AI-matched purchase.</p>
-        </div>
 
-        {/* Price Drop — lower-left middle */}
-        <div style={{bottom:'7%', left:'20%'}} className="hidden 2xl:block absolute w-56 bg-gradient-to-br from-lime-50 to-green-50 border border-lime-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-c">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">🏷️</span>
-            <span className="bg-lime-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Price Drop</span>
+          {/* ── MIDDLE ZONE CARDS ─────────────────────────────── */}
+
+          {/* Trending Deal — upper-left middle */}
+          <div style={{ top: '5%', left: '22%' }} className="hidden 2xl:block absolute w-60 bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-g">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">📈</span>
+              <span className="bg-sky-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Trending</span>
+            </div>
+            <h4 className="text-sm font-black text-slate-800 mb-1">Hot Right Now</h4>
+            <p className="text-xs text-slate-500 font-semibold leading-snug">2,310 people viewing this deal right now.</p>
+            <div className="mt-2.5 flex items-center gap-1">
+              {'★★★★★'.split('').map((s, i) => <span key={i} className="text-amber-400 text-xs">{s}</span>)}
+              <span className="text-[11px] text-slate-400 ml-0.5 font-bold">4.9</span>
+            </div>
           </div>
-          <h4 className="text-sm font-black text-slate-800 mb-1">Just Dropped</h4>
-          <p className="text-xs text-slate-500 font-semibold leading-snug">Price fell <span className="text-lime-600 font-black">$34</span> in the last hour.</p>
-        </div>
 
-        {/* Loyalty Points — lower-right middle */}
-        <div style={{bottom:'6%', right:'21%'}} className="hidden 2xl:block absolute w-60 bg-gradient-to-bl from-pink-50 to-rose-50 border border-pink-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-e">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">🎁</span>
-            <span className="bg-pink-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Rewards</span>
+          {/* AI Cashback — upper-right middle */}
+          <div style={{ top: '7%', right: '22%' }} className="hidden 2xl:block absolute w-60 bg-gradient-to-bl from-violet-50 to-fuchsia-50 border border-violet-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-h">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">💸</span>
+              <span className="bg-violet-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Cashback</span>
+            </div>
+            <h4 className="text-sm font-black text-slate-800 mb-1">Earn While You Shop</h4>
+            <p className="text-xs text-slate-500 font-semibold leading-snug">Get up to <span className="text-violet-600 font-black">12% cashback</span> on every AI-matched purchase.</p>
           </div>
-          <h4 className="text-sm font-black text-slate-800 mb-1">Loyalty Points</h4>
-          <p className="text-xs text-slate-500 font-semibold leading-snug">Earn <span className="text-pink-600 font-black">3×</span> points on AI-curated picks this weekend.</p>
-        </div>
 
-        {/* ── MIDDLE ZONE CHIPS ─────────────────────────────── */}
-        <div style={{top:'38%', left:'18%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip4 pointer-events-none">
-          <span className="text-[10px]">🔔</span>
-          <span className="text-[10px] font-black text-slate-700">Price alert set</span>
-        </div>
-        <div style={{top:'62%', left:'22%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip5 pointer-events-none">
-          <span className="text-[10px]">💚</span>
-          <span className="text-[10px] font-black text-slate-700">Eco-friendly pick</span>
-        </div>
-        <div style={{top:'55%', right:'19%'}} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip6 pointer-events-none">
-          <span className="text-[10px]">🚀</span>
-          <span className="text-[10px] font-black text-slate-700">Ships in 2 hrs</span>
-        </div>
+          {/* Price Drop — lower-left middle */}
+          <div style={{ bottom: '7%', left: '20%' }} className="hidden 2xl:block absolute w-56 bg-gradient-to-br from-lime-50 to-green-50 border border-lime-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-c">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">🏷️</span>
+              <span className="bg-lime-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Price Drop</span>
+            </div>
+            <h4 className="text-sm font-black text-slate-800 mb-1">Just Dropped</h4>
+            <p className="text-xs text-slate-500 font-semibold leading-snug">Price fell <span className="text-lime-600 font-black">$34</span> in the last hour.</p>
+          </div>
+
+          {/* Loyalty Points — lower-right middle */}
+          <div style={{ bottom: '6%', right: '21%' }} className="hidden 2xl:block absolute w-60 bg-gradient-to-bl from-pink-50 to-rose-50 border border-pink-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-e">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">🎁</span>
+              <span className="bg-pink-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Rewards</span>
+            </div>
+            <h4 className="text-sm font-black text-slate-800 mb-1">Loyalty Points</h4>
+            <p className="text-xs text-slate-500 font-semibold leading-snug">Earn <span className="text-pink-600 font-black">3×</span> points on AI-curated picks this weekend.</p>
+          </div>
+
+          {/* ── MIDDLE ZONE CHIPS ─────────────────────────────── */}
+          <div style={{ top: '38%', left: '18%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip4 pointer-events-none">
+            <span className="text-[10px]">🔔</span>
+            <span className="text-[10px] font-black text-slate-700">Price alert set</span>
+          </div>
+          <div style={{ top: '62%', left: '22%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip5 pointer-events-none">
+            <span className="text-[10px]">💚</span>
+            <span className="text-[10px] font-black text-slate-700">Eco-friendly pick</span>
+          </div>
+          <div style={{ top: '55%', right: '19%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip6 pointer-events-none">
+            <span className="text-[10px]">🚀</span>
+            <span className="text-[10px] font-black text-slate-700">Ships in 2 hrs</span>
+          </div>
 
         </div>{/* end parallax wrapper */}
 
@@ -1094,11 +1096,10 @@ export default function HomePage() {
                   {/* Heart button */}
                   <button
                     onClick={(e) => handleFavoriteClick(deal.id, e)}
-                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${
-                      isFav
-                        ? 'bg-rose-50 border-rose-200 text-rose-500'
-                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
-                    }`}
+                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${isFav
+                      ? 'bg-rose-50 border-rose-200 text-rose-500'
+                      : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
+                      }`}
                   >
                     <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
                   </button>
@@ -1167,7 +1168,7 @@ export default function HomePage() {
       {/* AI Recommendation Section (AI Smart Picks) */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-4">
             <div>
               <span className="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 text-[#3b42c4] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
@@ -1194,11 +1195,10 @@ export default function HomePage() {
                   <button
                     key={tab}
                     onClick={() => setActiveAiTab(tab)}
-                    className={`px-4 py-2 text-xs font-bold transition-all duration-200 cursor-pointer whitespace-nowrap ${
-                      active
-                        ? 'bg-white border border-slate-200 shadow-sm text-[#3b42c4]'
-                        : 'text-slate-500 hover:text-slate-800'
-                    }`}
+                    className={`px-4 py-2 text-xs font-bold transition-all duration-200 cursor-pointer whitespace-nowrap ${active
+                      ? 'bg-white border border-slate-200 shadow-sm text-[#3b42c4]'
+                      : 'text-slate-500 hover:text-slate-800'
+                      }`}
                   >
                     {labels[tab]}
                   </button>
@@ -1225,11 +1225,10 @@ export default function HomePage() {
                   {/* Heart button */}
                   <button
                     onClick={(e) => handleFavoriteClick(p.id, e)}
-                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${
-                      isFav
-                        ? 'bg-rose-50 border-rose-200 text-rose-500'
-                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
-                    }`}
+                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${isFav
+                      ? 'bg-rose-50 border-rose-200 text-rose-500'
+                      : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
+                      }`}
                   >
                     <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
                   </button>
@@ -1353,7 +1352,7 @@ export default function HomePage() {
           {/* Testimonial card */}
           <div className="relative bg-white border border-slate-200/60 rounded-3xl p-8 md:p-12 shadow-sm transition-all duration-300">
             <div className="absolute top-6 left-6 text-slate-100 text-6xl font-serif select-none pointer-events-none">“</div>
-            
+
             <div className="relative z-10 flex flex-col items-center">
               {/* Stars */}
               <div className="flex items-center gap-1 text-amber-500 mb-6">
@@ -1406,9 +1405,8 @@ export default function HomePage() {
               <button
                 key={idx}
                 onClick={() => setActiveTestimonial(idx)}
-                className={`h-2.5 rounded-full transition-all duration-300 ${
-                  activeTestimonial === idx ? 'w-6 bg-[#3b42c4]' : 'w-2.5 bg-slate-200'
-                }`}
+                className={`h-2.5 rounded-full transition-all duration-300 ${activeTestimonial === idx ? 'w-6 bg-[#3b42c4]' : 'w-2.5 bg-slate-200'
+                  }`}
               />
             ))}
           </div>
