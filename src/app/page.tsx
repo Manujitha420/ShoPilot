@@ -29,6 +29,191 @@ import {
   Flame
 } from 'lucide-react';
 
+// ─── Floating AI Chat Popup Component ───────────────────────────────────────
+interface ChatMsg { id: string; role: 'user'|'assistant'; content: string; products?: any[]; isError?: boolean; }
+
+const POPUP_PRESETS = [
+  'Recommend a laptop for programming',
+  'Best smartphones under $1000',
+  'Suggest gifts for a gamer',
+];
+
+function AIChatPopup() {
+  const [chatOpen, setChatOpen] = React.useState(false);
+  const [chatMessages, setChatMessages] = React.useState<ChatMsg[]>([
+    { id: 'welcome', role: 'assistant', content: "👋 Hi! I'm your ShoPilot AI. Ask me to recommend products, compare prices, or find deals!" },
+  ]);
+  const [chatInput, setChatInput] = React.useState('');
+  const [chatLoading, setChatLoading] = React.useState(false);
+  const chatEndRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, chatLoading]);
+
+  const sendChat = async (text: string) => {
+    const msg = text.trim();
+    if (!msg) return;
+    setChatInput('');
+    setChatLoading(true);
+    setChatMessages(prev => [...prev, { id: Math.random().toString(), role: 'user', content: msg }]);
+    try {
+      const history = chatMessages
+        .filter(m => m.id !== 'welcome' && !m.isError)
+        .map(m => ({ role: m.role, content: m.content }));
+      const res = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'chat', message: msg, history }),
+      });
+      const data = await res.json();
+      if (data.success === false) throw new Error(data.error || 'Failed');
+      setChatMessages(prev => [...prev, {
+        id: Math.random().toString(), role: 'assistant',
+        content: data.reply || "I couldn't process that.", products: data.products || [],
+      }]);
+    } catch (err: any) {
+      setChatMessages(prev => [...prev, {
+        id: Math.random().toString(), role: 'assistant',
+        content: err.message || 'Something went wrong. Please try again.', isError: true,
+      }]);
+    } finally { setChatLoading(false); }
+  };
+
+  return (
+    <>
+      {/* Chat Panel */}
+      <div
+        className={`fixed bottom-24 right-6 z-50 w-[370px] max-w-[calc(100vw-2rem)] bg-slate-950 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right ${
+          chatOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'
+        }`}
+        style={{ height: 520 }}
+      >
+        {/* Header */}
+        <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white">
+              <Sparkles className="w-4 h-4 animate-pulse" />
+            </div>
+            <div>
+              <p className="font-bold text-white text-sm leading-none">ShoPilot AI</p>
+              <span className="flex items-center gap-1 text-[10px] text-emerald-400 mt-0.5 font-semibold">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
+                Online &middot; Llama 3.3 70B
+              </span>
+            </div>
+          </div>
+          <button id="chat-popup-close-btn" onClick={() => setChatOpen(false)}
+            className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-none">
+          {chatMessages.map(msg => {
+            const isUser = msg.role === 'user';
+            return (
+              <div key={msg.id} className={`flex items-end gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}>
+                {!isUser && (
+                  <div className="w-7 h-7 rounded-lg bg-indigo-950 border border-indigo-900/60 flex items-center justify-center text-indigo-400 shrink-0">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/>
+                      <path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="16" y1="16" x2="16" y2="16.01"/>
+                    </svg>
+                  </div>
+                )}
+                <div className={`max-w-[80%] flex flex-col gap-2 ${isUser ? 'items-end' : 'items-start'}`}>
+                  <div className={`px-4 py-2.5 rounded-2xl text-xs leading-relaxed border ${
+                    isUser ? 'bg-indigo-600 border-indigo-500 text-white rounded-br-sm'
+                    : msg.isError ? 'bg-red-950/20 border-red-900/50 text-red-300 rounded-bl-sm'
+                    : 'bg-slate-900 border-slate-800 text-slate-200 rounded-bl-sm'
+                  }`}>{msg.content}</div>
+                  {!isUser && msg.products && msg.products.length > 0 && (
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none w-full max-w-full">
+                      {msg.products.slice(0, 4).map((p: any) => (
+                        <a key={p.id} href={`/products/${p.id}`} className="shrink-0 w-28 bg-slate-900 border border-slate-800 rounded-xl p-2 hover:border-indigo-500/50 transition-all group">
+                          <img src={p.thumbnail} alt={p.title} className="w-full h-16 object-cover rounded-lg mb-1.5 group-hover:scale-105 transition-transform" />
+                          <p className="text-[10px] font-bold text-slate-200 truncate">{p.title}</p>
+                          <p className="text-[10px] font-black text-indigo-400 mt-0.5">${p.price?.toFixed(2)}</p>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {isUser && (
+                  <div className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 shrink-0">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {chatLoading && (
+            <div className="flex items-end gap-2.5 justify-start">
+              <div className="w-7 h-7 rounded-lg bg-indigo-950 border border-indigo-900/60 flex items-center justify-center text-indigo-400 shrink-0 animate-pulse">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/>
+                </svg>
+              </div>
+              <div className="px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl rounded-bl-sm flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{animationDelay:'0ms'}} />
+                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{animationDelay:'150ms'}} />
+                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{animationDelay:'300ms'}} />
+              </div>
+            </div>
+          )}
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* Preset chips */}
+        {chatMessages.length === 1 && (
+          <div className="px-4 pb-2 flex flex-wrap gap-1.5 shrink-0">
+            {POPUP_PRESETS.map((p, i) => (
+              <button key={i} onClick={() => sendChat(p)}
+                className="text-[10px] px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 rounded-lg transition-all cursor-pointer font-medium">
+                {p}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Input bar */}
+        <form onSubmit={e => { e.preventDefault(); sendChat(chatInput); }}
+          className="p-3 border-t border-slate-800 flex gap-2 items-center shrink-0 bg-slate-900/60">
+          <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)}
+            disabled={chatLoading} placeholder="Ask me anything about products..."
+            className="flex-1 bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-200 rounded-xl px-4 py-2.5 outline-none text-xs disabled:opacity-50 placeholder-slate-600 transition-all"
+          />
+          <button type="submit" disabled={chatLoading || !chatInput.trim()}
+            className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 text-white disabled:text-slate-600 rounded-xl transition-all cursor-pointer disabled:cursor-not-allowed shrink-0">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
+          </button>
+        </form>
+      </div>
+
+      {/* FAB toggle */}
+      <button id="chat-popup-toggle-btn" onClick={() => setChatOpen(o => !o)}
+        title="Open AI Chat Assistant"
+        className={`fixed bottom-6 right-6 z-50 text-white p-4 rounded-full shadow-lg cursor-pointer hover:scale-105 transition-all flex items-center justify-center w-14 h-14 ${
+          chatOpen ? 'bg-slate-700 hover:bg-slate-600' : 'bg-black hover:bg-slate-900'
+        }`}
+      >
+        {chatOpen ? (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        ) : (
+          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/>
+            <path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="16" y1="16" x2="16" y2="16.01"/>
+            <path d="M9 11v-2a3 3 0 0 1 6 0v2"/>
+          </svg>
+        )}
+      </button>
+    </>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function HomePage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
@@ -1245,24 +1430,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Floating AI Assistant Robot Toggle Button */}
-      <Link
-        href="/chat"
-        title="Open AI Chat Assistant"
-        className="fixed bottom-6 right-6 z-40 bg-black text-white hover:bg-slate-900 p-4 rounded-full shadow-lg cursor-pointer hover:scale-105 transition-all flex items-center justify-center w-14 h-14"
-      >
-        <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          {/* Custom robot face SVG */}
-          <rect x="3" y="11" width="18" height="10" rx="2" />
-          <circle cx="12" cy="5" r="2" />
-          <path d="M12 7v4" />
-          <line x1="8" y1="16" x2="8" y2="16.01" />
-          <line x1="16" y1="16" x2="16" y2="16.01" />
-          <path d="M9 11v-2a3 3 0 0 1 6 0v2" />
-        </svg>
-      </Link>
+      {/* Floating AI Chat Popup */}
+      <AIChatPopup />
 
       <Footer />
+
     </div>
   );
 }
