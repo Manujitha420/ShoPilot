@@ -248,6 +248,21 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Hero parallax — only activates once user scrolls PAST the hero section
+  const heroRef = React.useRef<HTMLElement>(null);
+  const [heroParallax, setHeroParallax] = React.useState(0);
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (!heroRef.current) return;
+      const rect = heroRef.current.getBoundingClientRect();
+      // rect.top goes negative once the section scrolls off the top edge
+      const scrolledPast = Math.max(0, -rect.top);
+      setHeroParallax(scrolledPast);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Today's Deals (Flash Sale) data
   const todayDeals = [
     {
@@ -547,7 +562,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-16 md:py-24 bg-white text-center">
+      <section ref={heroRef} className="relative overflow-hidden py-16 md:py-24 bg-white text-center">
         <style>{`
           @keyframes float-a {
             0%, 100% { transform: translateY(0px) rotate(-3deg); }
@@ -613,7 +628,18 @@ export default function HomePage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] bg-purple-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
 
 
-        {/* ── FLOATING PROMO CARDS (scattered) ────────────────── */}
+        {/* ── FLOATING PROMO CARDS — parallax wrapper ────────── */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            transform: `translateY(-${heroParallax * 0.35}px)`,
+            willChange: 'transform',
+            transition: 'transform 0.1s linear',
+            pointerEvents: 'none',
+          }}
+        >
 
         {/* Flash Sale — far left, vertically high */}
         <div style={{top:'6%', left:'1%'}} className="hidden xl:block absolute w-64 bg-gradient-to-br from-rose-50 to-amber-50 border border-rose-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-a">
@@ -765,6 +791,8 @@ export default function HomePage() {
           <span className="text-[10px]">🚀</span>
           <span className="text-[10px] font-black text-slate-700">Ships in 2 hrs</span>
         </div>
+
+        </div>{/* end parallax wrapper */}
 
         <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
           {/* Badge */}
