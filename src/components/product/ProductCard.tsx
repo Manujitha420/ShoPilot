@@ -42,8 +42,16 @@ export default function ProductCard({
     toggleFavorite(product.id);
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Navigate to product detail page
+    router.push(`/products/${product.id}`);
+  };
+
   return (
-    <div className="group relative bg-white border border-slate-200/60 hover:border-slate-300 rounded-[20px] p-5 flex flex-col h-[420px] transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+    <div 
+      onClick={handleCardClick}
+      className="group relative bg-white border border-slate-200/60 hover:border-slate-300 rounded-[20px] p-5 flex flex-col h-[420px] transition-all duration-300 hover:shadow-md hover:-translate-y-1 cursor-pointer"
+    >
       
       {/* Product Image Container */}
       <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-50 mb-4 border border-slate-100">
@@ -93,7 +101,11 @@ export default function ProductCard({
         </div>
 
         {/* Title */}
-        <Link href={`/products/${product.id}`} className="block group-hover:text-[#3b42c4] transition-colors">
+        <Link 
+          href={`/products/${product.id}`} 
+          onClick={(e) => e.stopPropagation()}
+          className="block group-hover:text-[#3b42c4] transition-colors"
+        >
           <h3 className="text-sm font-bold text-slate-800 line-clamp-2 leading-snug">
             {product.title}
           </h3>
@@ -122,6 +134,7 @@ export default function ProductCard({
             <button
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 onCompareToggle();
               }}
               disabled={!isComparingSelected && !canCompare}
@@ -138,6 +151,7 @@ export default function ProductCard({
             {/* View Details Link */}
             <Link
               href={`/products/${product.id}`}
+              onClick={(e) => e.stopPropagation()}
               className="flex items-center gap-1 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all"
             >
               <span>Details</span>

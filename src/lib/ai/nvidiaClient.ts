@@ -256,7 +256,14 @@ function generateLocalMockResponse(prompt: string): any {
           cons: [
             product.stock < 10 ? 'Very limited stock remaining' : 'Subject to availability',
             product.discountPercentage ? `Discounted by ${product.discountPercentage}% (limited time offer)` : 'No current discounts active'
-          ]
+          ],
+          highlights: [
+            `Best for enthusiasts seeking quality in ${product.category || 'general'}`,
+            `Excellent rating of ${product.rating || 4.5} from customer reviews`,
+            `Great value for money at $${product.price}`,
+            `Worth buying under $${Math.ceil(product.price * 1.2)}`
+          ],
+          buyingAdvice: `This ${product.category || 'product'} is highly recommended for users seeking a reliable and cost-effective ${product.brand || 'Generic'} option because it offers strong design elements, good customer satisfaction, and excellent overall value.`
         };
       }
     } catch (e) {
@@ -266,7 +273,14 @@ function generateLocalMockResponse(prompt: string): any {
     return {
       summary: "This is a high-quality product matching your interest. It offers excellent build quality, premium specifications, and is highly reviewed by users.",
       pros: ["Great performance", "Premium build quality", "Good battery/durability"],
-      cons: ["Higher price point", "Limited color options"]
+      cons: ["Higher price point", "Limited color options"],
+      highlights: [
+        "Best for general users",
+        "Premium design aesthetics",
+        "Highly rated by verified buyers",
+        "Outstanding value for the features"
+      ],
+      buyingAdvice: "This product is recommended for mainstream consumers because it provides stable performance, premium feel, and great durability at a balanced price point."
     };
   }
 

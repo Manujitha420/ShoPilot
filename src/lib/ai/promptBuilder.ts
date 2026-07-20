@@ -131,7 +131,7 @@ Return ONLY valid JSON matching this schema. Do not output any markdown code blo
 export const buildProductSummaryPrompt = (productJson: string): string => {
   return `
 You are an expert product reviewer and assistant.
-Given the following product raw JSON data, write a concise product summary and list its key strengths (pros) and weaknesses (cons).
+Given the following product raw JSON data, write a concise product summary, list its key strengths (pros) and weaknesses (cons), extract 3-4 bullet-point key highlights (e.g., "Best for students", "Excellent battery life"), and provide tailored buying advice recommending who should buy this product and why.
 
 Product Data:
 ${productJson}
@@ -152,7 +152,14 @@ Return ONLY a valid JSON object matching the schema below. Do not wrap in markdo
   "cons": [
     "Weakness 1 (e.g. Heavy and bulky)",
     "Weakness 2 (e.g. Plastic build quality)"
-  ]
+  ],
+  "highlights": [
+    "Highlight 1 (e.g. Best for students)",
+    "Highlight 2 (e.g. Excellent battery life)",
+    "Highlight 3 (e.g. Great performance for gaming)",
+    "Highlight 4 (e.g. Worth buying under $900)"
+  ],
+  "buyingAdvice": "1-2 sentences of buying advice recommending who should buy this product and why. E.g., 'This laptop is recommended for software developers and university students because it offers strong performance, long battery life, and excellent value for money.'"
 }
 `;
 };

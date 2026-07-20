@@ -614,7 +614,11 @@ function ProductsContent() {
                     const compareSelected = compareProducts.some((p) => p.id === product.id);
 
                     return (
-                      <div key={product.id} className="group relative bg-white border border-slate-200/60 hover:border-slate-300 rounded-3xl p-5 flex flex-col h-[445px] transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+                      <div 
+                        key={product.id} 
+                        onClick={() => router.push(`/products/${product.id}`)}
+                        className="group relative bg-white border border-slate-200/60 hover:border-slate-300 rounded-3xl p-5 flex flex-col h-[445px] transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+                      >
                         
                         {/* Image Container */}
                         <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 mb-4 border border-slate-100">
@@ -661,7 +665,13 @@ function ProductsContent() {
                             </div>
                           </div>
 
-                          <h3 className="text-sm font-black text-slate-800 line-clamp-1 leading-snug">
+                          <h3 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/products/${product.id}`);
+                            }}
+                            className="text-sm font-black text-slate-800 line-clamp-1 leading-snug hover:text-[#3b42c4] transition-colors cursor-pointer"
+                          >
                             {product.title}
                           </h3>
                           <p className="text-[11px] text-slate-400 font-medium mt-0.5 line-clamp-2">
@@ -680,7 +690,10 @@ function ProductsContent() {
                             <div className="flex items-center gap-1.5">
                               {/* Quick View Button */}
                               <button
-                                onClick={() => setQuickViewProduct(product)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setQuickViewProduct(product);
+                                }}
                                 title="Quick View"
                                 className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 rounded-xl transition-all cursor-pointer"
                               >
@@ -689,7 +702,10 @@ function ProductsContent() {
 
                               {/* Compare Toggle */}
                               <button
-                                onClick={() => handleCompareToggle(product)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCompareToggle(product);
+                                }}
                                 title={compareSelected ? 'Remove Comparison' : 'Add to Compare'}
                                 className={`p-2 border rounded-xl transition-all cursor-pointer ${
                                   compareSelected 
@@ -702,9 +718,12 @@ function ProductsContent() {
 
                               {/* Add to Cart */}
                               <button
-                                onClick={() => addToCartMock(product)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addToCartMock(product);
+                                }}
                                 title="Add to Cart"
-                                className="p-2 bg-slate-900 hover:bg-slate-850 text-white rounded-xl transition-all cursor-pointer"
+                                className="p-2 bg-slate-900 hover:bg-slate-855 text-white rounded-xl transition-all cursor-pointer"
                               >
                                 <ShoppingCart className="w-4 h-4" />
                               </button>
