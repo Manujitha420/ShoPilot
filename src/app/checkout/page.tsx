@@ -552,9 +552,9 @@ export default function CheckoutPage() {
                     : 'bg-slate-50 border-slate-200'
                     }`}
                 >
-                  <img 
-                    src="https://www.freepnglogos.com/uploads/mastercard-png/what-are-the-visa-and-mastercard-limited-acceptance-programs-8.png" 
-                    alt="visa and mastercard" 
+                  <img
+                    src="https://www.freepnglogos.com/uploads/mastercard-png/what-are-the-visa-and-mastercard-limited-acceptance-programs-8.png"
+                    alt="visa and mastercard"
                     className="h-6 w-auto object-contain"
                   />
                 </button>
@@ -566,9 +566,9 @@ export default function CheckoutPage() {
                     : 'bg-slate-50 border-slate-200'
                     }`}
                 >
-                  <img 
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/PayPal_Logo2014.svg/960px-PayPal_Logo2014.svg.png?_=20230314143144" 
-                    alt="paypal" 
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/PayPal_Logo2014.svg/960px-PayPal_Logo2014.svg.png?_=20230314143144"
+                    alt="paypal"
                     className="h-5 w-auto object-contain"
                   />
                 </button>
@@ -580,9 +580,9 @@ export default function CheckoutPage() {
                     : 'bg-slate-50 border-slate-200'
                     }`}
                 >
-                  <img 
-                    src="https://download.logo.wine/logo/Google_Pay/Google_Pay-Logo.wine.png" 
-                    alt="google pay" 
+                  <img
+                    src="https://download.logo.wine/logo/Google_Pay/Google_Pay-Logo.wine.png"
+                    alt="google pay"
                     className="h-6 w-auto object-contain"
                   />
                 </button>
@@ -834,7 +834,7 @@ export default function CheckoutPage() {
                 <h3 className="text-sm font-black text-slate-900">Customer Support & Returns</h3>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Help & refund policies</p>
               </div>
-              
+
               <div className="space-y-3.5 text-xs font-semibold text-slate-600">
                 <div className="flex gap-3 items-start">
                   <span className="text-indigo-500 text-sm select-none">🛡</span>

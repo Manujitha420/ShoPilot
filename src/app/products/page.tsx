@@ -61,6 +61,37 @@ function ProductsContent() {
   // Cart Feedback
   const [cartFeedback, setCartFeedback] = useState<string | null>(null);
 
+  // Sync comparison state from/to localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('shopilot_compare');
+      if (stored) {
+        setCompareProducts(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    const handleCompareUpdate = () => {
+      try {
+        const stored = localStorage.getItem('shopilot_compare');
+        if (stored) {
+          setCompareProducts(JSON.parse(stored));
+        } else {
+          setCompareProducts([]);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    window.addEventListener('shopilot_compare_update', handleCompareUpdate);
+    window.addEventListener('storage', handleCompareUpdate);
+    return () => {
+      window.removeEventListener('shopilot_compare_update', handleCompareUpdate);
+      window.removeEventListener('storage', handleCompareUpdate);
+    };
+  }, []);
+
   // Sync parameters
   useEffect(() => {
     const category = searchParams?.get('category') || '';
@@ -193,13 +224,29 @@ function ProductsContent() {
     toggleFavorite(productId);
   };
 
+  const saveCompareList = (list: Product[]) => {
+    try {
+      localStorage.setItem('shopilot_compare', JSON.stringify(list));
+      setCompareProducts(list);
+      window.dispatchEvent(new Event('shopilot_compare_update'));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleCompareToggle = (product: Product) => {
-    setCompareProducts((prev) => {
-      const exists = prev.some((p) => p.id === product.id);
-      if (exists) return prev.filter((p) => p.id !== product.id);
-      if (prev.length >= 3) return [...prev.slice(1), product]; // limit comparison to 3
-      return [...prev, product];
-    });
+    const exists = compareProducts.some((p) => p.id === product.id);
+    let updated: Product[];
+    if (exists) {
+      updated = compareProducts.filter((p) => p.id !== product.id);
+    } else {
+      if (compareProducts.length >= 3) {
+        updated = [...compareProducts.slice(1), product];
+      } else {
+        updated = [...compareProducts, product];
+      }
+    }
+    saveCompareList(updated);
   };
 
   const addToCartMock = (product: Product) => {
@@ -798,7 +845,7 @@ function ProductsContent() {
                 <img src={p.thumbnail} alt={p.title} className="w-7 h-7 object-cover bg-white rounded-lg" />
                 <span className="text-xs font-bold text-slate-700 max-w-[100px] truncate">{p.title}</span>
                 <button
-                  onClick={() => setCompareProducts((prev) => prev.filter((item) => item.id !== p.id))}
+                  onClick={() => saveCompareList(compareProducts.filter((item) => item.id !== p.id))}
                   className="text-slate-400 hover:text-rose-500 cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />

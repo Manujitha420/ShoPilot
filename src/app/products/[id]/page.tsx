@@ -10,6 +10,7 @@ import useProducts from '@/hooks/useProducts';
 import useFavorites from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/Skeleton';
+import ProductComparison from '@/components/product/ProductComparison';
 import { 
   Star, 
   Heart, 
@@ -87,6 +88,10 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [cartFeedback, setCartFeedback] = useState<string | null>(null);
 
+  // Comparison State
+  const [compareProducts, setCompareProducts] = useState<any[]>([]);
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
+
   // AI Summary states
   const [aiLoading, setAiLoading] = useState(false);
   const [summary, setSummary] = useState<SummaryResult | null>(null);
@@ -102,6 +107,39 @@ export default function ProductDetailPage() {
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Load compare list on mount & custom events
+  useEffect(() => {
+    const syncCompare = () => {
+      try {
+        const stored = localStorage.getItem('shopilot_compare');
+        if (stored) {
+          setCompareProducts(JSON.parse(stored));
+        } else {
+          setCompareProducts([]);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    syncCompare();
+    window.addEventListener('shopilot_compare_update', syncCompare);
+    window.addEventListener('storage', syncCompare);
+    return () => {
+      window.removeEventListener('shopilot_compare_update', syncCompare);
+      window.removeEventListener('storage', syncCompare);
+    };
+  }, []);
+
+  const saveCompareToStorage = (list: any[]) => {
+    try {
+      localStorage.setItem('shopilot_compare', JSON.stringify(list));
+      setCompareProducts(list);
+      window.dispatchEvent(new Event('shopilot_compare_update'));
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // Sync active image on product load
   useEffect(() => {
@@ -274,37 +312,27 @@ export default function ProductDetailPage() {
   // Compare action
   const toggleCompareLocalStorage = () => {
     if (!product) return;
-    try {
-      const items = localStorage.getItem('shopilot_compare');
-      let compareList: number[] = items ? JSON.parse(items) : [];
-      if (compareList.includes(product.id)) {
-        compareList = compareList.filter(id => id !== product.id);
-        setCartFeedback('Removed product from Comparison list.');
-      } else {
-        if (compareList.length >= 4) {
-          setCartFeedback('You can compare up to 4 products at a time.');
-          setTimeout(() => setCartFeedback(null), 3000);
-          return;
-        }
-        compareList.push(product.id);
-        setCartFeedback('Added product to Comparison list! Navigate to catalog to compare.');
+    const exists = compareProducts.some((p: any) => p.id === product.id);
+    if (exists) {
+      const updated = compareProducts.filter((p: any) => p.id !== product.id);
+      saveCompareToStorage(updated);
+      setCartFeedback('Removed product from Comparison list.');
+    } else {
+      if (compareProducts.length >= 3) {
+        setCartFeedback('You can compare up to 3 products at a time.');
+        setTimeout(() => setCartFeedback(null), 3000);
+        return;
       }
-      localStorage.setItem('shopilot_compare', JSON.stringify(compareList));
-    } catch (e) {
-      console.error('Compare list storage error:', e);
+      const updated = [...compareProducts, product];
+      saveCompareToStorage(updated);
+      setCartFeedback('Added product to Comparison list! Click "Compare Specs" below to view.');
     }
     setTimeout(() => setCartFeedback(null), 3500);
   };
 
   const isProductInCompare = () => {
     if (!product) return false;
-    try {
-      const items = localStorage.getItem('shopilot_compare');
-      const compareList: number[] = items ? JSON.parse(items) : [];
-      return compareList.includes(product.id);
-    } catch (e) {
-      return false;
-    }
+    return compareProducts.some((p: any) => p.id === product.id);
   };
 
   // Review Helpful voting
@@ -1050,6 +1078,48 @@ export default function ProductDetailPage() {
             </div>
           </div>
         </>
+      )}
+      {/* Comparison Drawer */}
+      {compareProducts.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-2xl bg-white/95 border border-slate-200 shadow-xl rounded-2xl p-4 flex items-center justify-between gap-4 animate-slideUp backdrop-blur-sm">
+          <div className="flex items-center gap-3 overflow-x-auto scrollbar-none py-1">
+            <div className="w-8 h-8 bg-indigo-50 rounded-xl flex items-center justify-center text-[#3b42c4]">
+              <ArrowRightLeft className="w-4 h-4" />
+            </div>
+            {compareProducts.map((p) => (
+              <div key={p.id} className="relative flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shrink-0">
+                <img src={p.thumbnail} alt={p.title} className="w-7 h-7 object-cover bg-white rounded-lg" />
+                <span className="text-xs font-bold text-slate-700 max-w-[100px] truncate">{p.title}</span>
+                <button
+                  onClick={() => saveCompareToStorage(compareProducts.filter((item) => item.id !== p.id))}
+                  className="text-slate-400 hover:text-rose-500 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => setIsComparisonOpen(true)}
+            disabled={compareProducts.length < 2}
+            className="px-4 py-2.5 bg-[#3b42c4] hover:bg-[#2d33a6] disabled:bg-slate-100 disabled:text-slate-400 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed shrink-0"
+          >
+            Compare Specs
+          </button>
+        </div>
+      )}
+
+      {/* Comparison Modal */}
+      {isComparisonOpen && compareProducts.length >= 2 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white border border-slate-200 shadow-2xl rounded-[24px] w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <ProductComparison
+              productA={compareProducts[0]}
+              productB={compareProducts[1]}
+              onClose={() => setIsComparisonOpen(false)}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
