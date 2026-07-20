@@ -693,7 +693,7 @@ export default function CartPage() {
 
                   {/* Checkout CTA */}
                   <button
-                    onClick={() => triggerToast('Proceeding to Secure Checkout endpoint...')}
+                    onClick={() => router.push('/checkout')}
                     className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-2"
                   >
                     <ShieldCheck className="w-4.5 h-4.5" />
