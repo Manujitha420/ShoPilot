@@ -26,8 +26,12 @@ import {
   ShieldCheck,
   Check,
   Clock,
-  Flame
+  Flame,
+  Eye,
+  X
 } from 'lucide-react';
+
+
 
 // ─── Floating AI Chat Popup Component ───────────────────────────────────────
 interface ChatMsg { id: string; role: 'user' | 'assistant'; content: string; products?: any[]; isError?: boolean; }
@@ -228,6 +232,7 @@ export default function HomePage() {
 
   // Custom states for new interactive sections
   const [activeAiTab, setActiveAiTab] = useState<'recommended' | 'trending' | 'interests' | 'recent' | 'continue' | 'featured'>('recommended');
+  const [quickViewProduct, setQuickViewProduct] = useState<any | null>(null);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [timeLeft, setTimeLeft] = useState({ hours: 10, minutes: 45, seconds: 0 });
 
@@ -1086,23 +1091,48 @@ export default function HomePage() {
               return (
                 <div
                   key={deal.id}
-                  className="bg-white border border-slate-200/60 rounded-3xl p-5 flex flex-col relative group transition-all duration-300 hover:shadow-md shadow-sm"
+                  onClick={() => router.push(`/products/${deal.id}`)}
+                  className="bg-white border border-slate-200/60 rounded-3xl p-5 flex flex-col relative group transition-all duration-300 hover:shadow-md shadow-sm cursor-pointer hover:-translate-y-0.5"
                 >
                   {/* Discount percentage tag */}
                   <span className="absolute top-6 left-6 bg-rose-500 text-white font-extrabold text-[10px] tracking-wide uppercase px-2.5 py-1 rounded-lg z-20">
                     -{deal.discount}% Off
                   </span>
 
-                  {/* Heart button */}
-                  <button
-                    onClick={(e) => handleFavoriteClick(deal.id, e)}
-                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${isFav
-                      ? 'bg-rose-50 border-rose-200 text-rose-500'
-                      : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
-                      }`}
-                  >
-                    <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
-                  </button>
+                  {/* Quick Action Overlays */}
+                  <div className="absolute top-6 right-6 flex items-center gap-1.5 z-20">
+                    {/* Quick View Button */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setQuickViewProduct({
+                          id: deal.id,
+                          title: deal.title,
+                          category: deal.category,
+                          price: deal.price,
+                          rating: deal.rating,
+                          thumbnail: deal.image,
+                          description: 'AI Precision-matched Daily Deal. Limited quantity available at this exclusive discount.'
+                        });
+                      }}
+                      title="Quick Lookup"
+                      className="p-2.5 rounded-xl border bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white cursor-pointer transition-all"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+
+                    {/* Heart button */}
+                    <button
+                      onClick={(e) => handleFavoriteClick(deal.id, e)}
+                      className={`p-2.5 rounded-xl border transition-all duration-200 cursor-pointer ${isFav
+                        ? 'bg-rose-50 border-rose-200 text-rose-500'
+                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
+                        }`}
+                    >
+                      <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
+                    </button>
+                  </div>
 
                   {/* Image container */}
                   <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 mb-5 border border-slate-100 relative">
@@ -1152,7 +1182,12 @@ export default function HomePage() {
                     </div>
 
                     <button
-                      onClick={handleAddToCart}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAddToCart();
+                      }}
+
                       className="p-3 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-2xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
                     >
                       <ShoppingCart className="w-4.5 h-4.5" />
@@ -1214,7 +1249,8 @@ export default function HomePage() {
               return (
                 <div
                   key={p.id}
-                  className="bg-white border border-slate-200/60 rounded-3xl p-5 flex flex-col relative group transition-all duration-300 hover:shadow-md shadow-sm"
+                  onClick={() => router.push(`/products/${p.id}`)}
+                  className="bg-white border border-slate-200/60 rounded-3xl p-5 flex flex-col relative group transition-all duration-300 hover:shadow-md shadow-sm cursor-pointer hover:-translate-y-0.5"
                 >
                   {/* AI Match Score Badge */}
                   <span className="absolute top-6 left-6 bg-emerald-50 border border-emerald-100 text-emerald-600 font-extrabold text-[10px] tracking-wide uppercase px-2.5 py-1 rounded-xl z-20 flex items-center gap-1">
@@ -1222,16 +1258,40 @@ export default function HomePage() {
                     <span>{p.matchScore}% Match</span>
                   </span>
 
-                  {/* Heart button */}
-                  <button
-                    onClick={(e) => handleFavoriteClick(p.id, e)}
-                    className={`absolute top-6 right-6 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer z-20 ${isFav
-                      ? 'bg-rose-50 border-rose-200 text-rose-500'
-                      : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
-                      }`}
-                  >
-                    <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
-                  </button>
+                  {/* Quick Action Overlays */}
+                  <div className="absolute top-6 right-6 flex items-center gap-1.5 z-20">
+                    {/* Quick View Button */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setQuickViewProduct({
+                          id: p.id,
+                          title: p.title,
+                          category: p.category,
+                          price: p.price,
+                          rating: p.rating,
+                          thumbnail: p.image,
+                          description: `AI-Recommended matching catalog product. Matches ${p.matchScore}% with your browsing history and shopping style.`
+                        });
+                      }}
+                      title="Quick Lookup"
+                      className="p-2.5 rounded-xl border bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white cursor-pointer transition-all"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+
+                    {/* Heart button */}
+                    <button
+                      onClick={(e) => handleFavoriteClick(p.id, e)}
+                      className={`p-2.5 rounded-xl border transition-all duration-200 cursor-pointer ${isFav
+                        ? 'bg-rose-50 border-rose-200 text-rose-500'
+                        : 'bg-white/80 border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-white'
+                        }`}
+                    >
+                      <Heart className={`w-4.5 h-4.5 ${isFav ? 'fill-current' : ''}`} />
+                    </button>
+                  </div>
 
                   {/* Image container */}
                   <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 mb-5 border border-slate-100 relative">
@@ -1264,7 +1324,12 @@ export default function HomePage() {
                     </div>
 
                     <button
-                      onClick={handleAddToCart}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAddToCart();
+                      }}
+
                       className="p-3 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-2xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
                     >
                       <ShoppingCart className="w-4.5 h-4.5" />
@@ -1455,6 +1520,67 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Inline Quick Lookup Modal */}
+      {quickViewProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white border border-slate-200 shadow-2xl rounded-3xl max-w-2xl w-full p-6 relative overflow-hidden flex flex-col sm:flex-row gap-6 text-left">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setQuickViewProduct(null);
+              }}
+              className="absolute top-4 right-4 p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-500 hover:text-slate-800 transition-all cursor-pointer z-10"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <div className="w-full sm:w-1/2 aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 shrink-0">
+              <img src={quickViewProduct.thumbnail} alt={quickViewProduct.title} className="w-full h-full object-cover" />
+            </div>
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{quickViewProduct.category}</span>
+                <h3 className="text-lg font-black text-slate-800 mt-1 mb-2 leading-tight">{quickViewProduct.title}</h3>
+                <div className="flex items-center gap-1.5 mb-4">
+                  <div className="flex items-center gap-0.5 text-amber-500 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200/50">
+                    <Star className="w-3.5 h-3.5 fill-current" />
+                    <span className="font-extrabold text-xs">{quickViewProduct.rating.toFixed(1)}</span>
+                  </div>
+                  <span className="text-xs text-slate-400 font-semibold">Ready to Ship</span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed mb-4">{quickViewProduct.description}</p>
+              </div>
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                <span className="text-xl font-black text-slate-900">${quickViewProduct.price.toFixed(2)}</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setQuickViewProduct(null);
+                      router.push(`/products/${quickViewProduct.id}`);
+                    }}
+                    className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                  >
+                    View Details
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart();
+                      setQuickViewProduct(null);
+                    }}
+
+                    className="px-4 py-2.5 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    <span>Add to Cart</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating AI Chat Popup */}
       <AIChatPopup />
