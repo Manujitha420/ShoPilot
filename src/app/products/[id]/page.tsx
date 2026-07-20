@@ -238,7 +238,36 @@ export default function ProductDetailPage() {
   // Add to Cart / Buy Now actions
   const triggerCartAction = (actionName: string) => {
     if (!product) return;
-    setCartFeedback(`${actionName === 'buy' ? 'Proceeding to checkout with' : 'Added'} ${quantity} item(s) to Cart!`);
+    
+    try {
+      const cartData = localStorage.getItem('shopilot_cart');
+      let cartItems: any[] = cartData ? JSON.parse(cartData) : [];
+      
+      const existingItemIndex = cartItems.findIndex((item: any) => item.product.id === product.id);
+      
+      if (existingItemIndex > -1) {
+        cartItems[existingItemIndex].quantity += quantity;
+      } else {
+        cartItems.push({
+          product,
+          quantity,
+          variant: 'Standard / Default'
+        });
+      }
+      
+      localStorage.setItem('shopilot_cart', JSON.stringify(cartItems));
+      window.dispatchEvent(new Event('shopilot_cart_update'));
+      
+      if (actionName === 'buy') {
+        router.push('/cart');
+      } else {
+        setCartFeedback(`Added ${quantity} item(s) to Cart!`);
+      }
+    } catch (e) {
+      console.error('Failed to update cart storage:', e);
+      setCartFeedback('Failed to add item to cart.');
+    }
+    
     setTimeout(() => setCartFeedback(null), 3500);
   };
 

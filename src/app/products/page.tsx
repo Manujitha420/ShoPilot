@@ -203,7 +203,26 @@ function ProductsContent() {
   };
 
   const addToCartMock = (product: Product) => {
-    setCartFeedback(`Added "${product.title}" to Cart!`);
+    try {
+      const cartData = localStorage.getItem('shopilot_cart');
+      let cartItems: any[] = cartData ? JSON.parse(cartData) : [];
+      const existingItemIndex = cartItems.findIndex((item: any) => item.product.id === product.id);
+      if (existingItemIndex > -1) {
+        cartItems[existingItemIndex].quantity += 1;
+      } else {
+        cartItems.push({
+          product,
+          quantity: 1,
+          variant: 'Standard / Default'
+        });
+      }
+      localStorage.setItem('shopilot_cart', JSON.stringify(cartItems));
+      window.dispatchEvent(new Event('shopilot_cart_update'));
+      setCartFeedback(`Added "${product.title}" to Cart!`);
+    } catch (e) {
+      console.error('Failed to update cart:', e);
+      setCartFeedback('Failed to add to cart.');
+    }
     setTimeout(() => setCartFeedback(null), 2500);
   };
 

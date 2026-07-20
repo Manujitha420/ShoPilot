@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,6 +11,34 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const updateCartCount = () => {
+      try {
+        const cartData = localStorage.getItem('shopilot_cart');
+        if (cartData) {
+          const items = JSON.parse(cartData);
+          const count = items.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+          setCartCount(count);
+        } else {
+          setCartCount(0);
+        }
+      } catch (e) {
+        console.error('Failed to parse cart:', e);
+      }
+    };
+
+    updateCartCount();
+
+    window.addEventListener('shopilot_cart_update', updateCartCount);
+    window.addEventListener('storage', updateCartCount);
+
+    return () => {
+      window.removeEventListener('shopilot_cart_update', updateCartCount);
+      window.removeEventListener('storage', updateCartCount);
+    };
+  }, []);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -85,9 +113,17 @@ export default function Navbar() {
             </button>
 
             {/* Shopping Cart */}
-            <button className="p-2 hover:bg-slate-50 rounded-full transition-colors cursor-pointer text-slate-500 hover:text-slate-800">
+            <Link 
+              href="/cart"
+              className="p-2 hover:bg-slate-50 rounded-full transition-colors cursor-pointer text-slate-500 hover:text-slate-800 relative"
+            >
               <ShoppingCart className="w-5 h-5 stroke-[2]" />
-            </button>
+              {cartCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-indigo-600 border border-white text-white text-[9px] font-black rounded-full flex items-center justify-center animate-pulse">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
 
             {/* Profile Avatar Dropdown */}
             <div className="relative">
