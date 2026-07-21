@@ -1344,63 +1344,59 @@ export default function HomePage() {
       </section>
 
       {/* AI Powered Features Section */}
-      <section className="py-16 bg-[#f4f7fe]/40 border-t border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-            AI-Powered Precision
-          </h2>
-          <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
-            Experience shopping at the speed of thought with our suite of intelligent features.
-          </p>
+      <section className="relative overflow-hidden min-h-[600px] flex items-center justify-center bg-slate-950 border-t border-b border-slate-900 py-20">
+        
+        {/* Background Image Collage Grid */}
+        <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-4 gap-2 opacity-25 select-none pointer-events-none">
+          <div className="relative h-full w-full">
+            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop" alt="Lifestyle 1" className="absolute inset-0 w-full h-full object-cover" />
+          </div>
+          <div className="relative h-full w-full">
+            <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=600&auto=format&fit=crop" alt="Lifestyle 2" className="absolute inset-0 w-full h-full object-cover" />
+          </div>
+          <div className="relative h-full w-full">
+            <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=600&auto=format&fit=crop" alt="Lifestyle 3" className="absolute inset-0 w-full h-full object-cover" />
+          </div>
+          <div className="relative h-full w-full">
+            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=600&auto=format&fit=crop" alt="Lifestyle 4" className="absolute inset-0 w-full h-full object-cover" />
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
-            {/* feature 1 */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.01)] text-left flex flex-col h-full relative overflow-hidden">
-              <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-[#3b42c4] mb-4">
-                <SparkleIcon className="w-5 h-5 fill-current" />
-              </div>
-              <h3 className="text-base font-bold text-slate-800 mb-2">Smart Recommendations</h3>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Personalized picks based on your style, behavior, and preferences.
-              </p>
-              <div className="absolute bottom-0 inset-x-0 h-1 bg-[#3b42c4]" />
-            </div>
+        {/* Semi-transparent dark overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/50 to-slate-950/80 backdrop-blur-[2px]" />
 
-            {/* feature 2 */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.01)] text-left flex flex-col h-full relative overflow-hidden">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 mb-4">
-                <Layers className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-bold text-slate-800 mb-2">Review Summaries</h3>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Instantly digest thousands of customer reviews into key pros and cons.
-              </p>
-              <div className="absolute bottom-0 inset-x-0 h-1 bg-purple-500" />
-            </div>
+        {/* Vertical Stack Content */}
+        <div className="relative z-10 max-w-5xl w-full mx-auto px-6 sm:px-10 lg:px-16 text-center">
+          <span className="inline-flex items-center gap-1.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-6">
+            <SparkleIcon className="w-3.5 h-3.5 fill-current" />
+            <span>AI-Powered Precision</span>
+          </span>
 
-            {/* feature 3 */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.01)] text-left flex flex-col h-full relative overflow-hidden">
-              <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 mb-4">
-                <ArrowRightLeft className="w-5 h-5" />
+          <div className="flex flex-col gap-4 mt-2">
+            {[
+              { title: 'Smart Recommendations', desc: 'Personalized picks based on your style, behavior, and preferences.' },
+              { title: 'Review Summaries', desc: 'Instantly digest thousands of customer reviews into key pros and cons.' },
+              { title: 'Price Comparisons', desc: 'Real-time tracking and comparison across 1,000+ top retailers.' },
+              { title: 'Personal Assistant', desc: 'Chat 24/7 with your personal shopper to find anything you need.' }
+            ].map((item, idx) => (
+              <div key={idx} className="group relative py-6 cursor-pointer border-b border-white/10 last:border-b-0 hover:border-indigo-500/50 transition-all duration-300">
+                <div className="flex flex-col items-start w-full">
+                  {/* Vertical Point Title - one line (whitespace-nowrap), italic on hover */}
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-wider text-white transition-all duration-550 group-hover:text-indigo-400 group-hover:italic whitespace-nowrap">
+                    {item.title}
+                  </h3>
+                  
+                  {/* Description - only visible on hover, placed under the heading but aligned to the right side */}
+                  <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-500 ease-in-out w-full">
+                    <div className="overflow-hidden">
+                      <p className="text-xs sm:text-sm text-indigo-200 leading-relaxed font-semibold transition-all duration-500 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 text-right max-w-xl ml-auto mt-2">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-base font-bold text-slate-800 mb-2">Price Comparisons</h3>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Real-time tracking and comparison across 1,000+ top retailers.
-              </p>
-              <div className="absolute bottom-0 inset-x-0 h-1 bg-orange-500" />
-            </div>
-
-            {/* feature 4 */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.01)] text-left flex flex-col h-full relative overflow-hidden">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
-                <Bot className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-bold text-slate-800 mb-2">Personal Assistant</h3>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Chat 24/7 with your personal shopper to find anything you need.
-              </p>
-              <div className="absolute bottom-0 inset-x-0 h-1 bg-blue-500" />
-            </div>
+            ))}
           </div>
         </div>
       </section>
