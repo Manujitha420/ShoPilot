@@ -499,6 +499,14 @@ export default function HomePage() {
     setActiveTestimonial(prev => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
+  // Autoplay testimonials every 4 seconds
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveTestimonial(prev => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [activeTestimonial]);
+
   // Trending Products data
   const trendingProducts = [
     {
@@ -1412,6 +1420,12 @@ export default function HomePage() {
 
           {/* Testimonial card */}
           <div className="relative bg-white border border-slate-200/60 rounded-3xl p-8 md:p-12 shadow-sm transition-all duration-300">
+            <style>{`
+              @keyframes slide-progress {
+                0% { width: 0%; }
+                100% { width: 100%; }
+              }
+            `}</style>
             <div className="absolute top-6 left-6 text-slate-100 text-6xl font-serif select-none pointer-events-none">“</div>
 
             <div className="relative z-10 flex flex-col items-center">
@@ -1458,17 +1472,29 @@ export default function HomePage() {
                 <ChevronRight className="w-4.5 h-4.5 stroke-[2.5]" />
               </button>
             </div>
+
           </div>
 
           {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-6">
+          <div className="flex justify-center gap-2.5 mt-6">
             {testimonials.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveTestimonial(idx)}
-                className={`h-2.5 rounded-full transition-all duration-300 ${activeTestimonial === idx ? 'w-6 bg-[#3b42c4]' : 'w-2.5 bg-slate-200'
-                  }`}
-              />
+                className={`h-2.5 rounded-full transition-all duration-300 relative overflow-hidden cursor-pointer ${
+                  activeTestimonial === idx ? 'w-8 bg-indigo-100' : 'w-2.5 bg-slate-200'
+                }`}
+              >
+                {activeTestimonial === idx && (
+                  <div
+                    key={activeTestimonial}
+                    className="absolute top-0 left-0 h-full bg-[#3b42c4] rounded-full"
+                    style={{
+                      animation: 'slide-progress 4.05s linear forwards'
+                    }}
+                  />
+                )}
+              </button>
             ))}
           </div>
 
