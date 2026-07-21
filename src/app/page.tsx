@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
+import { useCartAnimation } from '@/hooks/useCartAnimation';
 import {
   Sparkles,
   Search,
@@ -369,6 +370,12 @@ function CategoryGrid() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Optional: mock user
+const mockUser = {
+  name: 'Alex Rivera',
+  email: 'alex@example.com',
+};
+
 export default function HomePage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
@@ -377,7 +384,9 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const { animateCartAdd, flyingDotsOverlay } = useCartAnimation();
 
   // Custom states for new interactive sections
   const [activeAiTab, setActiveAiTab] = useState<'recommended' | 'trending' | 'interests' | 'recent' | 'continue' | 'featured'>('recommended');
@@ -744,8 +753,36 @@ export default function HomePage() {
     toggleFavorite(productId);
   };
 
-  const handleAddToCart = () => {
-    setCartCount(prev => prev + 1);
+  const handleAddToCart = (e?: React.MouseEvent, product?: any) => {
+    animateCartAdd(e, () => {
+      setCartCount(prev => prev + 1);
+      try {
+        const cartData = localStorage.getItem('shopilot_cart');
+        let cartItems: any[] = cartData ? JSON.parse(cartData) : [];
+        
+        const itemProduct = product || { 
+          id: Date.now(), 
+          title: 'Flash Deal Item', 
+          price: 99.99, 
+          image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
+          category: 'General'
+        };
+
+        const existingItemIndex = cartItems.findIndex((item: any) => item.product.id === itemProduct.id);
+        if (existingItemIndex > -1) {
+          cartItems[existingItemIndex].quantity += 1;
+        } else {
+          cartItems.push({
+            product: itemProduct,
+            quantity: 1,
+            variant: 'Standard / Default'
+          });
+        }
+        
+        localStorage.setItem('shopilot_cart', JSON.stringify(cartItems));
+        window.dispatchEvent(new Event('shopilot_cart_update'));
+      } catch (err) {}
+    });
   };
 
   return (
@@ -783,6 +820,20 @@ export default function HomePage() {
             0%, 100% { transform: translateY(0px); }
             50%       { transform: translateY(-8px); }
           }
+          @keyframes item-drop {
+            0%   { transform: translateY(-40px) scale(0); opacity: 0; }
+            20%  { transform: translateY(-30px) scale(1.2); opacity: 1; }
+            80%  { transform: translateY(0px) scale(0.8); opacity: 1; }
+            100% { transform: translateY(10px) scale(0); opacity: 0; }
+          }
+          @keyframes btn-catch {
+            0%   { transform: translateY(0) scale(1); }
+            30%  { transform: translateY(0) scale(1); } /* Wait for item to drop */
+            50%  { transform: translateY(6px) scale(0.92); } /* Catch it (squash down) */
+            75%  { transform: translateY(-4px) scale(1.05); } /* Rebound jump up */
+            100% { transform: translateY(0) scale(1); }
+          }
+          .btn-catch-anim { animation: btn-catch 0.5s ease-out forwards; }
           .flt-a { animation: float-a 6s ease-in-out infinite; }
           .flt-b { animation: float-b 7.5s ease-in-out infinite; }
           .flt-c { animation: float-c 5.5s ease-in-out infinite; }
@@ -1224,7 +1275,7 @@ export default function HomePage() {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        handleAddToCart();
+                        handleAddToCart(e, deal);
                       }}
 
                       className="p-3 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-2xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
@@ -1366,7 +1417,7 @@ export default function HomePage() {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        handleAddToCart();
+                        handleAddToCart(e, p);
                       }}
 
                       className="p-3 bg-[#3b42c4] hover:bg-[#2d33a6] text-white rounded-2xl cursor-pointer shadow-sm transition-all duration-300 flex items-center justify-center"
@@ -1630,7 +1681,7 @@ export default function HomePage() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleAddToCart();
+                      handleAddToCart(e, quickViewProduct);
                       setQuickViewProduct(null);
                     }}
 
@@ -1645,6 +1696,9 @@ export default function HomePage() {
           </div>
         </div>
       )}
+
+      {/* Flying Dots Overlay */}
+      {flyingDotsOverlay}
 
       {/* Floating AI Chat Popup */}
       <AIChatPopup />

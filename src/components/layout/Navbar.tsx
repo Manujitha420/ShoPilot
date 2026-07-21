@@ -109,7 +109,7 @@ export default function Navbar() {
             </button>
 
             {/* Shopping Cart */}
-            <Link 
+            <Link
               href="/cart"
               className="p-2 hover:bg-slate-50 rounded-full transition-colors cursor-pointer text-slate-500 hover:text-slate-800 relative"
             >
@@ -173,8 +173,8 @@ export default function Navbar() {
             </div>
 
             {/* Settings Button */}
-            <button 
-              onClick={() => router.push('/settings')} 
+            <button
+              onClick={() => router.push('/settings')}
               className="p-2 hover:bg-slate-50 rounded-full transition-colors cursor-pointer text-slate-500 hover:text-slate-800"
               title="Settings"
             >

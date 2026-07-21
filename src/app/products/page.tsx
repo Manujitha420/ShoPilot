@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useFavorites } from '@/hooks/useFavorites';
 import useProducts from '@/hooks/useProducts';
 import useSearchProducts from '@/hooks/useSearchProducts';
+import { useCartAnimation } from '@/hooks/useCartAnimation';
 import { Product } from '@/types';
 import ProductComparison from '@/components/product/ProductComparison';
 import { 
@@ -27,6 +28,7 @@ function ProductsContent() {
   const searchParams = useSearchParams();
   const { isAuthenticated } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { animateCartAdd, flyingDotsOverlay } = useCartAnimation();
 
   // URL Params Sync
   const initialCategory = searchParams?.get('category') || '';
@@ -281,6 +283,8 @@ function ProductsContent() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 relative">
       <Navbar />
+      {/* Flying Dots Overlay */}
+      {flyingDotsOverlay}
 
       {/* Cart Toast Feedback */}
       {cartFeedback && (
@@ -786,7 +790,7 @@ function ProductsContent() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  addToCartMock(product);
+                                  animateCartAdd(e, () => addToCartMock(product));
                                 }}
                                 title="Add to Cart"
                                 className="p-2 bg-slate-900 hover:bg-slate-855 text-white rounded-xl transition-all cursor-pointer"
@@ -905,8 +909,9 @@ function ProductsContent() {
               <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                 <span className="text-xl font-black text-slate-900">${quickViewProduct.price.toFixed(2)}</span>
                 <button
-                  onClick={() => {
-                    addToCartMock(quickViewProduct);
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    animateCartAdd(e, () => addToCartMock(quickViewProduct));
                     setQuickViewProduct(null);
                   }}
                   className="px-5 py-2.5 bg-slate-900 hover:bg-slate-850 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"

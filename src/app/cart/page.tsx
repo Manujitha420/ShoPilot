@@ -495,7 +495,7 @@ export default function CartPage() {
                             <div className="flex items-center justify-between gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                               <span>{item.product.brand || 'Generic'}</span>
                               <span className="text-indigo-500 bg-indigo-50 border border-indigo-100/60 px-1.5 py-0.5 rounded-md">
-                                {item.product.category.replace('-', ' ')}
+                                {item.product.category ? item.product.category.replace('-', ' ') : 'General'}
                               </span>
                             </div>
                             <Link href={`/products/${item.product.id}`} className="hover:text-indigo-600 transition-colors">
@@ -508,7 +508,7 @@ export default function CartPage() {
                               <span>|</span>
                               <div className="flex items-center gap-0.5 text-amber-500">
                                 <Star className="w-3.5 h-3.5 fill-current" />
-                                <span>{item.product.rating.toFixed(1)} ({item.product.reviews?.length || 3})</span>
+                                <span>{(item.product.rating || 4.5).toFixed(1)} ({item.product.reviews?.length || 3})</span>
                               </div>
                             </div>
                           </div>

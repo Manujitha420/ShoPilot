@@ -25,3 +25,21 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+@keyframes item-drop {
+  0%   { transform: translateY(-40px) scale(0); opacity: 0; }
+  20%  { transform: translateY(-30px) scale(1.2); opacity: 1; }
+  80%  { transform: translateY(0px) scale(0.8); opacity: 1; }
+  100% { transform: translateY(10px) scale(0); opacity: 0; }
+}
+
+@keyframes btn-catch {
+  0%   { transform: translateY(0) scale(1); }
+  30%  { transform: translateY(0) scale(1); } /* Wait for item to drop */
+  50%  { transform: translateY(6px) scale(0.92); } /* Catch it (squash down) */
+  75%  { transform: translateY(-4px) scale(1.05); } /* Rebound jump up */
+  100% { transform: translateY(0) scale(1); }
+}
+
+.btn-catch-anim { 
+  animation: btn-catch 0.5s ease-out forwards; 
+}
