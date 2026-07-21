@@ -234,6 +234,8 @@ export default function HomePage() {
   const [activeAiTab, setActiveAiTab] = useState<'recommended' | 'trending' | 'interests' | 'recent' | 'continue' | 'featured'>('recommended');
   const [quickViewProduct, setQuickViewProduct] = useState<any | null>(null);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [testimonialVisible, setTestimonialVisible] = useState(true);
+  const [displayedTestimonial, setDisplayedTestimonial] = useState(0);
   const [timeLeft, setTimeLeft] = useState({ hours: 10, minutes: 45, seconds: 0 });
 
   // Countdown timer effect
@@ -488,24 +490,49 @@ export default function HomePage() {
       rating: 5,
       comment: "The UI is clean, extremely responsive, and the AI features are genuinely useful. I recommend ShoPilot to all my coworkers who shop online.",
       avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80'
+    },
+    {
+      name: 'Marcus Reid',
+      role: 'Frequent Shopper',
+      rating: 4,
+      comment: "ShoPilot genuinely cut my research time in half. The AI picks up on subtle preferences I didn't even realise I had. Would love to see even more retailer integrations down the road.",
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80'
+    },
+    {
+      name: 'Priya Nair',
+      role: 'Lifestyle Blogger',
+      rating: 4,
+      comment: "I was sceptical at first, but the personalised recommendations are genuinely spot-on. Found my perfect skincare set in under two minutes. A few more filter options would make this perfect!",
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
     }
   ];
 
+  const goToTestimonial = (idx: number) => {
+    if (idx === displayedTestimonial) return;
+    setTestimonialVisible(false);
+    setTimeout(() => {
+      setDisplayedTestimonial(idx);
+      setActiveTestimonial(idx);
+      setTestimonialVisible(true);
+    }, 300);
+  };
+
   const nextTestimonial = () => {
-    setActiveTestimonial(prev => (prev + 1) % testimonials.length);
+    goToTestimonial((displayedTestimonial + 1) % testimonials.length);
   };
 
   const prevTestimonial = () => {
-    setActiveTestimonial(prev => (prev - 1 + testimonials.length) % testimonials.length);
+    goToTestimonial((displayedTestimonial - 1 + testimonials.length) % testimonials.length);
   };
 
   // Autoplay testimonials every 4 seconds
   React.useEffect(() => {
     const timer = setInterval(() => {
-      setActiveTestimonial(prev => (prev + 1) % testimonials.length);
+      goToTestimonial((displayedTestimonial + 1) % testimonials.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, [activeTestimonial]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayedTestimonial]);
 
   // Trending Products data
   const trendingProducts = [
@@ -1425,32 +1452,43 @@ export default function HomePage() {
                 0% { width: 0%; }
                 100% { width: 100%; }
               }
+              @keyframes testimonial-fade-in {
+                from { opacity: 0; transform: translateY(8px); }
+                to   { opacity: 1; transform: translateY(0); }
+              }
             `}</style>
             <div className="absolute top-6 left-6 text-slate-100 text-6xl font-serif select-none pointer-events-none">“</div>
 
-            <div className="relative z-10 flex flex-col items-center">
+            <div
+              className="relative z-10 flex flex-col items-center"
+              style={{
+                opacity: testimonialVisible ? 1 : 0,
+                transform: testimonialVisible ? 'translateY(0)' : 'translateY(8px)',
+                transition: 'opacity 0.3s ease, transform 0.3s ease'
+              }}
+            >
               {/* Stars */}
               <div className="flex items-center gap-1 text-amber-500 mb-6">
-                {[...Array(testimonials[activeTestimonial].rating)].map((_, i) => (
+                {[...Array(testimonials[displayedTestimonial].rating)].map((_, i) => (
                   <Star key={i} className="w-5 h-5 fill-current" />
                 ))}
               </div>
 
               {/* Comment text */}
               <p className="text-slate-600 text-base md:text-lg leading-relaxed font-medium italic mb-8 max-w-2xl">
-                &ldquo;{testimonials[activeTestimonial].comment}&rdquo;
+                &ldquo;{testimonials[displayedTestimonial].comment}&rdquo;
               </p>
 
               {/* User profile info */}
               <div className="flex items-center gap-3.5">
                 <img
-                  src={testimonials[activeTestimonial].avatar}
-                  alt={testimonials[activeTestimonial].name}
+                  src={testimonials[displayedTestimonial].avatar}
+                  alt={testimonials[displayedTestimonial].name}
                   className="w-12 h-12 rounded-full object-cover border-2 border-slate-100 shadow-sm"
                 />
                 <div className="text-left">
-                  <h4 className="text-sm font-bold text-slate-900">{testimonials[activeTestimonial].name}</h4>
-                  <p className="text-xs text-slate-400 font-semibold">{testimonials[activeTestimonial].role}</p>
+                  <h4 className="text-sm font-bold text-slate-900">{testimonials[displayedTestimonial].name}</h4>
+                  <p className="text-xs text-slate-400 font-semibold">{testimonials[displayedTestimonial].role}</p>
                 </div>
               </div>
             </div>
@@ -1480,12 +1518,12 @@ export default function HomePage() {
             {testimonials.map((_, idx) => (
               <button
                 key={idx}
-                onClick={() => setActiveTestimonial(idx)}
+                onClick={() => goToTestimonial(idx)}
                 className={`h-2.5 rounded-full transition-all duration-300 relative overflow-hidden cursor-pointer ${
-                  activeTestimonial === idx ? 'w-8 bg-indigo-100' : 'w-2.5 bg-slate-200'
+                  displayedTestimonial === idx ? 'w-8 bg-indigo-100' : 'w-2.5 bg-slate-200'
                 }`}
               >
-                {activeTestimonial === idx && (
+                {displayedTestimonial === idx && (
                   <div
                     key={activeTestimonial}
                     className="absolute top-0 left-0 h-full bg-[#3b42c4] rounded-full"
