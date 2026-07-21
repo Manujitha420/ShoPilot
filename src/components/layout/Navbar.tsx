@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { Bell, ShoppingCart, LogOut, User } from 'lucide-react';
+import { Bell, ShoppingCart, LogOut, User, Settings } from 'lucide-react';
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -44,7 +44,6 @@ export default function Navbar() {
     { href: '/', label: 'Home' },
     { href: '/products', label: 'Products' },
     { href: '/#categories', label: 'Categories' },
-    { href: '/favorites', label: 'Favorites' },
   ];
 
   const handleCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -60,7 +59,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-6 sm:px-10 lg:px-16">
         <div className="flex items-center justify-between h-16 sm:h-20">
 
           {/* Logo */}
@@ -90,15 +89,12 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={isCategoriesLink ? handleCategoryClick : undefined}
-                  className={`text-sm font-semibold text-[16px] tracking-wide transition-all duration-200 py-1.5 px-1 relative ${isActive
+                  className={`text-sm font-semibold text-[16px] tracking-wide py-1.5 px-1 relative transition-colors duration-300 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-left after:scale-x-0 after:bg-[#3b42c4] after:transition-transform after:duration-300 hover:after:scale-x-100 ${isActive
                     ? 'text-[#3b42c4]'
-                    : 'text-slate-500 hover:text-slate-900'
+                    : 'text-slate-500 hover:text-[#3b42c4]'
                     }`}
                 >
                   <span>{link.label}</span>
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3b42c4] rounded-full" />
-                  )}
                 </Link>
               );
             })}
@@ -162,14 +158,6 @@ export default function Navbar() {
                     <p className="text-xs text-slate-400 truncate">@{user.username}</p>
                   </div>
 
-                  <Link
-                    href="/favorites"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  >
-                    <span>My Favorites</span>
-                  </Link>
-
                   <button
                     onClick={() => {
                       setIsDropdownOpen(false);
@@ -183,6 +171,15 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+
+            {/* Settings Button */}
+            <button 
+              onClick={() => router.push('/settings')} 
+              className="p-2 hover:bg-slate-50 rounded-full transition-colors cursor-pointer text-slate-500 hover:text-slate-800"
+              title="Settings"
+            >
+              <Settings className="w-5 h-5 stroke-[2]" />
+            </button>
           </div>
         </div>
       </div>
