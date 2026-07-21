@@ -220,6 +220,155 @@ function AIChatPopup() {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+const categories = [
+  {
+    href: '/products?category=smartphones',
+    label: 'Electronics',
+    badge: 'Tech Hub',
+    img: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80',
+    imgHover: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80',
+    span: 'md:row-span-2 md:col-span-1 min-h-[360px]',
+    height: 'h-[320px] md:h-full',
+  },
+  {
+    href: '/products?category=laptops',
+    label: 'Laptops',
+    badge: null,
+    img: 'https://images.unsplash.com/photo-1496181130204-7552cc145cdb?w=600&auto=format&fit=crop&q=80',
+    imgHover: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&auto=format&fit=crop&q=80',
+    span: 'md:col-span-2',
+    height: 'h-[220px]',
+  },
+  {
+    href: '/products?category=furniture',
+    label: 'Furniture',
+    badge: null,
+    img: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&auto=format&fit=crop&q=80',
+    imgHover: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=600&auto=format&fit=crop&q=80',
+    span: '',
+    height: 'h-[220px]',
+  },
+  {
+    href: '/products?category=beauty',
+    label: 'Beauty',
+    badge: null,
+    img: 'https://images.unsplash.com/photo-1608248597481-496100c80836?w=600&auto=format&fit=crop&q=80',
+    imgHover: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80',
+    span: '',
+    height: 'h-[220px]',
+  },
+];
+
+const bottomCategories = [
+  {
+    href: '/products?category=groceries',
+    label: 'Groceries',
+    img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80',
+    imgHover: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&auto=format&fit=crop&q=80',
+  },
+  {
+    href: '/products?category=fragrances',
+    label: 'Fragrances',
+    img: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80',
+    imgHover: 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=600&auto=format&fit=crop&q=80',
+  },
+];
+
+function CategoryGrid() {
+  const cardRefs = React.useRef<(HTMLAnchorElement | null)[]>([]);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    cardRefs.current.forEach((el) => { if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      {/* Top Grid Area */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {categories.map((cat, i) => (
+          <a
+            key={cat.label}
+            href={cat.href}
+            ref={(el) => { cardRefs.current[i] = el; }}
+            className={`cat-card group relative overflow-hidden rounded-[24px] bg-slate-50 ${cat.height} ${cat.span} border border-slate-100 cursor-pointer`}
+            style={{ '--delay': `${i * 90}ms` } as React.CSSProperties}
+          >
+            {/* Images */}
+            <div className="absolute inset-0 z-0">
+              <img src={cat.img} alt={cat.label} className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:opacity-0" />
+              <img src={cat.imgHover} alt={`${cat.label} alt`} className="absolute inset-0 w-full h-full object-cover opacity-0 scale-105 transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:opacity-100" />
+            </div>
+            {/* Indigo overlay sweep from bottom */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#3b42c4]/80 via-[#3b42c4]/20 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            {/* Default white gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-white/15 to-transparent z-10 group-hover:opacity-0 transition-opacity duration-500" />
+            {/* Shadow lift */}
+            <div className="absolute inset-0 rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] group-hover:shadow-[0_16px_48px_rgba(59,66,196,0.22)] transition-shadow duration-500 z-0 pointer-events-none" />
+            {/* Label area */}
+            <div className="absolute bottom-6 left-6 z-20 flex flex-col items-start gap-1">
+              {cat.badge && (
+                <span className="bg-[#eef2ff] text-[#3b42c4] group-hover:bg-white/20 group-hover:text-white font-extrabold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-md transition-colors duration-400">
+                  {cat.badge}
+                </span>
+              )}
+              <span className="text-xl font-bold text-slate-800 group-hover:text-white transition-colors duration-400">
+                {cat.label}
+              </span>
+            </div>
+            {/* Browse badge — appears on hover */}
+            <div className="absolute bottom-6 right-6 z-20 flex items-center gap-1.5 bg-white/90 text-[#3b42c4] text-xs font-bold px-3 py-1.5 rounded-full opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-400 shadow-sm">
+              Browse <span>→</span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {/* Bottom Grid Area */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {bottomCategories.map((cat, i) => (
+          <a
+            key={cat.label}
+            href={cat.href}
+            ref={(el) => { cardRefs.current[categories.length + i] = el; }}
+            className="cat-card group relative overflow-hidden rounded-[24px] bg-slate-50 h-[180px] border border-slate-100 cursor-pointer"
+            style={{ '--delay': `${(categories.length + i) * 90}ms` } as React.CSSProperties}
+          >
+            <div className="absolute inset-0 z-0">
+              <img src={cat.img} alt={cat.label} className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:opacity-0" />
+              <img src={cat.imgHover} alt={`${cat.label} alt`} className="absolute inset-0 w-full h-full object-cover opacity-0 scale-105 transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:opacity-100" />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#3b42c4]/80 via-[#3b42c4]/20 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-white/15 to-transparent z-10 group-hover:opacity-0 transition-opacity duration-500" />
+            <div className="absolute inset-0 rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] group-hover:shadow-[0_16px_48px_rgba(59,66,196,0.22)] transition-shadow duration-500 z-0 pointer-events-none" />
+            <div className="absolute bottom-6 left-6 z-20">
+              <span className="text-xl font-bold text-slate-800 group-hover:text-white transition-colors duration-400">
+                {cat.label}
+              </span>
+            </div>
+            <div className="absolute bottom-6 right-6 z-20 flex items-center gap-1.5 bg-white/90 text-[#3b42c4] text-xs font-bold px-3 py-1.5 rounded-full opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-400 shadow-sm">
+              Browse <span>→</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function HomePage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
@@ -604,7 +753,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section ref={heroRef} className="relative overflow-hidden py-16 md:py-24 bg-white text-center">
+      <section ref={heroRef} className="relative py-16 md:py-24 bg-white text-center">
         <style>{`
           @keyframes float-a {
             0%, 100% { transform: translateY(0px) rotate(-3deg); }
@@ -658,16 +807,18 @@ export default function HomePage() {
           .flt-chip6 { animation: float-chip 6.5s ease-in-out infinite 2s; }
         `}</style>
 
-        {/* Dot-grid background pattern */}
-        <div
-          className="absolute inset-0 -z-10 pointer-events-none opacity-[0.35]"
-          style={{ backgroundImage: 'radial-gradient(circle, #c7d2fe 1px, transparent 1px)', backgroundSize: '28px 28px' }}
-        />
-
-        {/* Soft background glow blobs */}
-        <div className="absolute top-0 left-1/4 w-[480px] h-[480px] bg-indigo-100/50 rounded-full blur-3xl -z-10 pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-rose-100/40 rounded-full blur-3xl -z-10 pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] bg-purple-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
+        {/* Background layer — overflow-hidden so dots/blobs stay inside section */}
+        <div className="absolute inset-0 overflow-hidden -z-10 pointer-events-none">
+          {/* Dot-grid background pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.35]"
+            style={{ backgroundImage: 'radial-gradient(circle, #c7d2fe 1px, transparent 1px)', backgroundSize: '28px 28px' }}
+          />
+          {/* Soft background glow blobs */}
+          <div className="absolute top-0 left-1/4 w-[480px] h-[480px] bg-indigo-100/50 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-[360px] h-[360px] bg-rose-100/40 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] bg-purple-100/30 rounded-full blur-3xl" />
+        </div>
 
 
         {/* ── FLOATING PROMO CARDS — parallax wrapper ────────── */}
@@ -684,7 +835,7 @@ export default function HomePage() {
         >
 
           {/* Flash Sale — far left, vertically high */}
-          <div style={{ top: '6%', left: '1%' }} className="hidden xl:block absolute w-64 bg-gradient-to-br from-rose-50 to-amber-50 border border-rose-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-a">
+          <div style={{ top: '6%', left: '1%' }} className="hidden lg:block absolute w-64 bg-gradient-to-br from-rose-50 to-amber-50 border border-rose-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-a">
             <div className="flex items-center gap-2 mb-2.5">
               <span className="text-lg">🔥</span>
               <span className="bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Flash Sale</span>
@@ -713,7 +864,7 @@ export default function HomePage() {
           </div>
 
           {/* Free Shipping — bottom-left, pushed in a bit */}
-          <div style={{ bottom: '4%', left: '7%' }} className="hidden xl:block absolute w-64 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-e">
+          <div style={{ bottom: '4%', left: '7%' }} className="hidden lg:block absolute w-64 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-e">
             <div className="flex items-center gap-2 mb-2.5">
               <span className="text-lg">📦</span>
               <span className="bg-emerald-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Free Ship</span>
@@ -723,7 +874,7 @@ export default function HomePage() {
           </div>
 
           {/* New Arrival — right side, sits near top-right corner */}
-          <div style={{ top: '3%', right: '2%' }} className="hidden xl:block absolute w-64 bg-gradient-to-bl from-purple-50 to-indigo-50 border border-purple-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-b">
+          <div style={{ top: '3%', right: '2%' }} className="hidden lg:block absolute w-64 bg-gradient-to-bl from-purple-50 to-indigo-50 border border-purple-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-b">
             <div className="flex items-center gap-2 mb-2.5">
               <span className="text-lg">✨</span>
               <span className="bg-purple-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">New Arrival</span>
@@ -751,7 +902,7 @@ export default function HomePage() {
           </div>
 
           {/* Top Rated — bottom-right, with a slight inward push */}
-          <div style={{ bottom: '5%', right: '4%' }} className="hidden xl:block absolute w-64 bg-gradient-to-bl from-amber-50 to-yellow-50 border border-amber-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-f">
+          <div style={{ bottom: '5%', right: '4%' }} className="hidden lg:block absolute w-64 bg-gradient-to-bl from-amber-50 to-yellow-50 border border-amber-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-f">
             <div className="flex items-center gap-2 mb-2.5">
               <span className="text-lg">⭐</span>
               <span className="bg-amber-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Top Rated</span>
@@ -761,15 +912,15 @@ export default function HomePage() {
           </div>
 
           {/* ── FLOATING STAT CHIPS (scattered) ─────────────────── */}
-          <div style={{ top: '28%', left: '9%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip pointer-events-none">
+          <div style={{ top: '28%', left: '9%' }} className="hidden lg:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip pointer-events-none">
             <span className="text-[10px]">🛒</span>
             <span className="text-[10px] font-black text-slate-700">1,248 sold today</span>
           </div>
-          <div style={{ top: '18%', right: '9%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip2 pointer-events-none">
+          <div style={{ top: '18%', right: '9%' }} className="hidden lg:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip2 pointer-events-none">
             <span className="text-[10px]">🤖</span>
             <span className="text-[10px] font-black text-slate-700">AI found 3 better deals</span>
           </div>
-          <div style={{ bottom: '25%', right: '10%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip3 pointer-events-none">
+          <div style={{ bottom: '25%', right: '10%' }} className="hidden lg:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip3 pointer-events-none">
             <span className="text-[10px]">⚡</span>
             <span className="text-[10px] font-black text-slate-700">Code AISHOP20 active</span>
           </div>
@@ -777,7 +928,7 @@ export default function HomePage() {
           {/* ── MIDDLE ZONE CARDS ─────────────────────────────── */}
 
           {/* Trending Deal — upper-left middle */}
-          <div style={{ top: '5%', left: '22%' }} className="hidden 2xl:block absolute w-60 bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-g">
+          <div style={{ top: '5%', left: '22%' }} className="hidden lg:block absolute w-60 bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-g">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">📈</span>
               <span className="bg-sky-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Trending</span>
@@ -791,7 +942,7 @@ export default function HomePage() {
           </div>
 
           {/* AI Cashback — upper-right middle */}
-          <div style={{ top: '7%', right: '22%' }} className="hidden 2xl:block absolute w-60 bg-gradient-to-bl from-violet-50 to-fuchsia-50 border border-violet-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-h">
+          <div style={{ top: '7%', right: '22%' }} className="hidden lg:block absolute w-60 bg-gradient-to-bl from-violet-50 to-fuchsia-50 border border-violet-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-h">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">💸</span>
               <span className="bg-violet-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Cashback</span>
@@ -801,7 +952,7 @@ export default function HomePage() {
           </div>
 
           {/* Price Drop — lower-left middle */}
-          <div style={{ bottom: '7%', left: '20%' }} className="hidden 2xl:block absolute w-56 bg-gradient-to-br from-lime-50 to-green-50 border border-lime-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-c">
+          <div style={{ bottom: '7%', left: '20%' }} className="hidden lg:block absolute w-56 bg-gradient-to-br from-lime-50 to-green-50 border border-lime-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-c">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">🏷️</span>
               <span className="bg-lime-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Price Drop</span>
@@ -811,7 +962,7 @@ export default function HomePage() {
           </div>
 
           {/* Loyalty Points — lower-right middle */}
-          <div style={{ bottom: '6%', right: '21%' }} className="hidden 2xl:block absolute w-60 bg-gradient-to-bl from-pink-50 to-rose-50 border border-pink-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-e">
+          <div style={{ bottom: '6%', right: '21%' }} className="hidden lg:block absolute w-60 bg-gradient-to-bl from-pink-50 to-rose-50 border border-pink-200/60 p-5 rounded-2xl z-10 shadow-md text-left flt-e">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">🎁</span>
               <span className="bg-pink-500 text-white font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md">Rewards</span>
@@ -821,15 +972,15 @@ export default function HomePage() {
           </div>
 
           {/* ── MIDDLE ZONE CHIPS ─────────────────────────────── */}
-          <div style={{ top: '38%', left: '18%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip4 pointer-events-none">
+          <div style={{ top: '38%', left: '18%' }} className="hidden lg:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip4 pointer-events-none">
             <span className="text-[10px]">🔔</span>
             <span className="text-[10px] font-black text-slate-700">Price alert set</span>
           </div>
-          <div style={{ top: '62%', left: '22%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip5 pointer-events-none">
+          <div style={{ top: '62%', left: '22%' }} className="hidden lg:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip5 pointer-events-none">
             <span className="text-[10px]">💚</span>
             <span className="text-[10px] font-black text-slate-700">Eco-friendly pick</span>
           </div>
-          <div style={{ top: '55%', right: '19%' }} className="hidden 2xl:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip6 pointer-events-none">
+          <div style={{ top: '55%', right: '19%' }} className="hidden lg:flex absolute items-center gap-1.5 bg-white border border-slate-200 shadow-md px-3 py-1.5 rounded-full z-10 flt-chip6 pointer-events-none">
             <span className="text-[10px]">🚀</span>
             <span className="text-[10px] font-black text-slate-700">Ships in 2 hrs</span>
           </div>
@@ -906,6 +1057,18 @@ export default function HomePage() {
 
       {/* Category Section */}
       <section id="categories" className="py-16 bg-white border-b border-slate-100">
+        <style>{`
+          @keyframes cat-fade-up {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
+          .cat-card {
+            opacity: 0;
+          }
+          .cat-card.in-view {
+            animation: cat-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms) both;
+          }
+        `}</style>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="flex items-end justify-between mb-8">
@@ -927,169 +1090,10 @@ export default function HomePage() {
           </div>
 
           {/* Custom Category Grid Layout */}
-          <div className="space-y-6">
-            {/* Top Grid Area */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Smartphones (tall, left card) */}
-              <Link
-                href="/products?category=smartphones"
-                className="md:row-span-2 relative overflow-hidden rounded-[24px] bg-slate-50 h-[320px] md:h-full min-h-[360px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
-              >
-                <div className="absolute inset-0 z-0">
-                  <img
-                    src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80"
-                    alt="Smartphones"
-                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
-                  />
-                  <img
-                    src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80"
-                    alt="Smartphones Hover"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
-                  />
-                </div>
-                {/* Light overlay at the bottom */}
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/20 to-transparent z-10" />
-                <div className="absolute bottom-6 left-6 z-20 flex flex-col items-start gap-1">
-                  <span className="bg-[#eef2ff] text-[#3b42c4] font-extrabold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-md">
-                    Tech Hub
-                  </span>
-                  <span className="text-xl font-bold text-slate-800">
-                    Electronics
-                  </span>
-                </div>
-              </Link>
-
-              {/* Laptops (wide, top right card) */}
-              <Link
-                href="/products?category=laptops"
-                className="md:col-span-2 relative overflow-hidden rounded-[24px] bg-slate-50 h-[220px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
-              >
-                <div className="absolute inset-0 z-0">
-                  <img
-                    src="https://images.unsplash.com/photo-1496181130204-7552cc145cdb?w=600&auto=format&fit=crop&q=80"
-                    alt="Laptops"
-                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
-                  />
-                  <img
-                    src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&auto=format&fit=crop&q=80"
-                    alt="Laptops Hover"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-10" />
-                <div className="absolute bottom-6 left-6 z-20">
-                  <span className="text-xl font-bold text-slate-800">
-                    Laptops
-                  </span>
-                </div>
-              </Link>
-
-              {/* Furniture */}
-              <Link
-                href="/products?category=furniture"
-                className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[220px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
-              >
-                <div className="absolute inset-0 z-0">
-                  <img
-                    src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&auto=format&fit=crop&q=80"
-                    alt="Furniture"
-                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
-                  />
-                  <img
-                    src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=600&auto=format&fit=crop&q=80"
-                    alt="Furniture Hover"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-10" />
-                <div className="absolute bottom-6 left-6 z-20">
-                  <span className="text-xl font-bold text-slate-800">
-                    Furniture
-                  </span>
-                </div>
-              </Link>
-
-              {/* Beauty */}
-              <Link
-                href="/products?category=beauty"
-                className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[220px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
-              >
-                <div className="absolute inset-0 z-0">
-                  <img
-                    src="https://images.unsplash.com/photo-1608248597481-496100c80836?w=600&auto=format&fit=crop&q=80"
-                    alt="Beauty"
-                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
-                  />
-                  <img
-                    src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80"
-                    alt="Beauty Hover"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-10" />
-                <div className="absolute bottom-6 left-6 z-20">
-                  <span className="text-xl font-bold text-slate-800">
-                    Beauty
-                  </span>
-                </div>
-              </Link>
-            </div>
-
-            {/* Bottom Grid Area */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Groceries */}
-              <Link
-                href="/products?category=groceries"
-                className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[180px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
-              >
-                <div className="absolute inset-0 z-0">
-                  <img
-                    src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80"
-                    alt="Groceries"
-                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
-                  />
-                  <img
-                    src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&auto=format&fit=crop&q=80"
-                    alt="Groceries Hover"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-10" />
-                <div className="absolute bottom-6 left-6 z-20">
-                  <span className="text-xl font-bold text-slate-800">
-                    Groceries
-                  </span>
-                </div>
-              </Link>
-
-              {/* Fragrances */}
-              <Link
-                href="/products?category=fragrances"
-                className="relative overflow-hidden rounded-[24px] bg-slate-50 h-[180px] group border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-md cursor-pointer"
-              >
-                <div className="absolute inset-0 z-0">
-                  <img
-                    src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80"
-                    alt="Fragrances"
-                    className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-0"
-                  />
-                  <img
-                    src="https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=600&auto=format&fit=crop&q=80"
-                    alt="Fragrances Hover"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-100"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 to-transparent z-10" />
-                <div className="absolute bottom-6 left-6 z-20">
-                  <span className="text-xl font-bold text-slate-800">
-                    Fragrances
-                  </span>
-                </div>
-              </Link>
-            </div>
-          </div>
+          <CategoryGrid />
         </div>
       </section>
+
 
       {/* Today's Deals (Flash Sale) Section */}
       <section className="py-16 bg-slate-50 border-t border-b border-slate-100">
