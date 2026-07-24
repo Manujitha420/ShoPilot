@@ -23,9 +23,9 @@ function LoginFormContent() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push(redirectPath);
+      window.location.href = redirectPath;
     }
-  }, [isAuthenticated, router, redirectPath]);
+  }, [isAuthenticated, redirectPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
