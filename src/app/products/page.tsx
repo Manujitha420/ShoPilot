@@ -287,8 +287,9 @@ function ProductsContent() {
 
       {/* Cart Toast Feedback */}
       {cartFeedback && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-[#3b42c4] text-white text-xs font-bold px-5 py-3 rounded-full shadow-lg flex items-center gap-2 animate-bounce">
-          <ShoppingCart className="w-4 h-4" />
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-2xl pointer-events-none"
+          style={{ background: 'linear-gradient(135deg, #3b42c4, #6366f1)', boxShadow: '0 8px 30px rgba(59,66,196,0.45)', animation: 'slideUpFade 0.35s cubic-bezier(0.34,1.56,0.64,1) both' }}>
+          <ShoppingCart className="w-4 h-4 shrink-0" />
           <span>{cartFeedback}</span>
         </div>
       )}
