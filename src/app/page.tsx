@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
 import { useCartAnimation } from '@/hooks/useCartAnimation';
+import aiService from '@/services/ai.service';
 import {
   Sparkles,
   Search,
@@ -66,13 +67,7 @@ function AIChatPopup() {
       const history = chatMessages
         .filter(m => m.id !== 'welcome' && !m.isError)
         .map(m => ({ role: m.role, content: m.content }));
-      const res = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'chat', message: msg, history }),
-      });
-      const data = await res.json();
-      if (data.success === false) throw new Error(data.error || 'Failed');
+      const data = await aiService.chat(msg, history);
       setChatMessages(prev => [...prev, {
         id: Math.random().toString(), role: 'assistant',
         content: data.reply || "I couldn't process that.", products: data.products || [],

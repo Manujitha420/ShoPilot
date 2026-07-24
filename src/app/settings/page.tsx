@@ -51,7 +51,15 @@ type TabType =
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, isLoading } = useAuth();
+  
+  // Protect route: Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login?redirect=/settings');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
   const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -223,6 +231,14 @@ export default function SettingsPage() {
     { id: 'help', label: 'Help & FAQs', icon: <HelpCircle className="w-4 h-4" /> },
     { id: 'about', label: 'About App', icon: <Info className="w-4 h-4" /> }
   ];
+
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3b42c4]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 relative">

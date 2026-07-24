@@ -36,7 +36,7 @@ import {
   Check,
   Award
 } from 'lucide-react';
-import axios from 'axios';
+import aiService from '@/services/ai.service';
 
 interface SummaryResult {
   summary: string;
@@ -163,14 +163,11 @@ export default function ProductDetailPage() {
         setAiLoading(true);
         setAiError(null);
         try {
-          const res = await axios.post('/api/ai', {
-            type: 'summary',
-            product,
-          });
-          if (res.data.success === false) {
-            throw new Error(res.data.error || 'Failed to fetch summary');
+          const data = await aiService.getSummary(product);
+          if (data.success === false) {
+            throw new Error(data.error || 'Failed to fetch summary');
           }
-          setSummary(res.data);
+          setSummary(data);
         } catch (err: any) {
           console.error('Summary fetch error:', err);
           setAiError(
@@ -362,12 +359,7 @@ export default function ProductDetailPage() {
       const promptContext = `[Context Product: ${product.title}, Brand: ${product.brand}, Price: $${product.price}, Category: ${product.category}, Rating: ${product.rating}, Description: ${product.description}]`;
       const messageWithContext = history.length === 0 ? `${promptContext} ${text}` : text;
 
-      const res = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'chat', message: messageWithContext, history }),
-      });
-      const data = await res.json();
+      const data = await aiService.chat(messageWithContext, history);
       if (data.success === false) throw new Error(data.error || 'Failed to get response');
       
       setChatMessages(prev => [...prev, {

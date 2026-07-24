@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { Bell, ShoppingCart, LogOut, User, Settings } from 'lucide-react';
+import { Bell, ShoppingCart, LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { useCategories } from '@/hooks/useCategories';
+import { CATEGORY_IMAGES, DEFAULT_IMAGE } from '@/constants';
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -12,6 +14,26 @@ export default function Navbar() {
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const { data: categories, isLoading: isCategoriesLoading } = useCategories();
+  const [isCategoriesHovered, setIsCategoriesHovered] = useState(false);
+  const hoverTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setIsCategoriesHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsCategoriesHovered(false);
+    }, 150);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const updateCartCount = () => {
@@ -43,23 +65,11 @@ export default function Navbar() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/products', label: 'Products' },
-    { href: '/#categories', label: 'Categories' },
   ];
-
-  const handleCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // If we're on the home page, intercept and scroll smoothly
-    if (pathname === '/') {
-      e.preventDefault();
-      const el = document.getElementById('categories');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 shadow-sm">
-      <div className="w-full px-6 sm:px-10 lg:px-16">
+      <div className="w-full px-6 sm:px-10 lg:px-16 relative z-20">
         <div className="flex items-center justify-between h-16 sm:h-20">
 
           {/* Logo */}
@@ -72,23 +82,13 @@ export default function Navbar() {
           {/* Navigation Links - Centered */}
           <nav className="hidden md:flex items-center text-[20px] font-semibold gap-8 absolute left-1/2 -translate-x-1/2">
             {navLinks.map((link) => {
-              const isCategoriesLink = link.href === '/#categories';
-
               // Define active states
-              let isActive = false;
-              if (isCategoriesLink) {
-                isActive = false; // Categories is scroll-based anchor
-              } else if (link.href === '/') {
-                isActive = pathname === '/';
-              } else {
-                isActive = pathname?.startsWith(link.href);
-              }
+              const isActive = link.href === '/' ? pathname === '/' : pathname?.startsWith(link.href);
 
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  onClick={isCategoriesLink ? handleCategoryClick : undefined}
                   className={`text-sm font-semibold text-[16px] tracking-wide py-1.5 px-1 relative transition-colors duration-300 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-left after:scale-x-0 after:bg-[#3b42c4] after:transition-transform after:duration-300 hover:after:scale-x-100 ${isActive
                     ? 'text-[#3b42c4]'
                     : 'text-slate-500 hover:text-[#3b42c4]'
@@ -98,9 +98,24 @@ export default function Navbar() {
                 </Link>
               );
             })}
+
+            {/* Categories Hover Dropdown Trigger */}
+            <div
+              className="relative py-4"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button
+                className={`flex items-center gap-1.5 text-sm font-semibold text-[16px] tracking-wide py-1.5 px-1 relative transition-colors duration-300 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-left after:scale-x-0 after:bg-[#3b42c4] after:transition-transform after:duration-300 hover:after:scale-x-100 text-slate-500 hover:text-[#3b42c4] cursor-pointer ${
+                  isCategoriesHovered ? 'after:scale-x-100 text-[#3b42c4]' : ''
+                }`}
+              >
+                <span>Categories</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isCategoriesHovered ? 'rotate-180' : ''}`} />
+              </button>
+            </div>
           </nav>
 
-          {/* User controls (Notification, Cart, Avatar) */}
           <div className="flex items-center gap-4 sm:gap-6">
             {/* Notification Bell */}
             <button className="p-2 hover:bg-slate-50 rounded-full transition-colors relative cursor-pointer text-slate-500 hover:text-slate-800">
@@ -184,8 +199,54 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Dropdown Panel - Full Screen Width */}
+      {isCategoriesHovered && (
+        <div
+          className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-2xl z-[100] animate-fadeIn before:absolute before:-top-4 before:left-0 before:right-0 before:h-4 before:content-['']"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className="w-full px-6 sm:px-10 lg:px-16 py-6 max-h-[380px] overflow-y-auto scrollbar-none">
+            <div className="grid grid-cols-6 gap-3">
+              {isCategoriesLoading ? (
+                <div className="col-span-6 flex justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3b42c4]"></div>
+                </div>
+              ) : categories && categories.length > 0 ? (
+                categories.map((category) => (
+                  <Link
+                    key={category.slug}
+                    href={`/products?category=${category.slug}`}
+                    onClick={() => setIsCategoriesHovered(false)}
+                    className="group flex flex-col gap-2 p-1.5 rounded-xl hover:bg-slate-50 transition-all text-center"
+                  >
+                    {/* Image Container - compact height */}
+                    <div className="w-full h-[64px] rounded-lg overflow-hidden bg-slate-100 relative shadow-sm border border-slate-100/50">
+                      <img
+                        src={CATEGORY_IMAGES[category.slug] || DEFAULT_IMAGE}
+                        alt={category.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                      />
+                    </div>
+                    {/* Label */}
+                    <span className="text-[12px] font-bold text-slate-700 group-hover:text-[#3b42c4] transition-colors self-center relative py-0.5 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-left after:scale-x-0 after:bg-[#3b42c4] after:transition-transform after:duration-300 group-hover:after:scale-x-100 truncate max-w-full">
+                      {category.name}
+                    </span>
+                  </Link>
+                ))
+              ) : (
+                <div className="col-span-6 text-center text-xs text-slate-400 py-6">
+                  No categories found
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Scrolling Discount Banner */}
-      <div className="w-full bg-[#3b42c4] text-white overflow-hidden py-4 text-[13px] font-bold select-none border-t border-indigo-500/20 relative z-50">
+      <div className="w-full bg-[#3b42c4] text-white overflow-hidden py-4 text-[13px] font-bold select-none border-t border-indigo-500/20 relative z-10">
         <style>{`
           @keyframes marquee-ltr {
             0% {

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Product } from '@/types';
 import { Sparkles, ArrowRightLeft, ThumbsUp, ThumbsDown, Check, X, AlertCircle } from 'lucide-react';
-import axios from 'axios';
+import aiService from '@/services/ai.service';
 
 interface ProductComparisonProps {
   productA: Product;
@@ -37,17 +37,13 @@ export default function ProductComparison({
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post('/api/ai', {
-        type: 'compare',
-        productA,
-        productB,
-      });
+      const data = await aiService.compare(productA, productB);
       
-      if (response.data.success === false) {
-        throw new Error(response.data.error || 'Failed to compare');
+      if (data.success === false) {
+        throw new Error(data.error || 'Failed to compare');
       }
 
-      setResult(response.data);
+      setResult(data);
     } catch (err: any) {
       console.error('Comparison error:', err);
       setError(

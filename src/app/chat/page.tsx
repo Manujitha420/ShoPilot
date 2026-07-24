@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Product } from '@/types';
 import { Sparkles, Send, Bot, User, HelpCircle, ArrowRight, CornerDownRight, Heart, Star, AlertCircle, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
-import axios from 'axios';
+import aiService from '@/services/ai.service';
 
 interface Message {
   id: string;
@@ -75,13 +75,7 @@ export default function ChatPage() {
           content: msg.content,
         }));
 
-      const response = await axios.post('/api/ai', {
-        type: 'chat',
-        message: text,
-        history,
-      });
-
-      const data = response.data;
+      const data = await aiService.chat(text, history);
 
       if (data.success === false) {
         throw new Error(data.error || 'Failed to get AI reply');

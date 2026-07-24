@@ -8,9 +8,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { useFavorites } from '@/hooks/useFavorites';
 import useProducts from '@/hooks/useProducts';
 import useSearchProducts from '@/hooks/useSearchProducts';
+import { useCategories } from '@/hooks/useCategories';
 import { useCartAnimation } from '@/hooks/useCartAnimation';
 import { Product } from '@/types';
 import ProductComparison from '@/components/product/ProductComparison';
+import { MOCK_COLORS, MOCK_SIZES } from '@/constants';
 import { 
   Search, ChevronLeft, ChevronRight, SlidersHorizontal, ArrowRightLeft, 
   X, Sparkles, Loader2, Star, Heart, Eye, ShoppingCart, Info, Award, 
@@ -19,16 +21,13 @@ import {
 
 const ITEMS_PER_PAGE = 9;
 
-// Mock list of colors and sizes for display
-const MOCK_COLORS = ['Matte Black', 'Silver', 'Alpine White', 'Midnight Blue', 'Rose Gold'];
-const MOCK_SIZES = ['Standard', 'Compact', 'Pro', 'Max'];
-
 function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { animateCartAdd, flyingDotsOverlay } = useCartAnimation();
+  const { data: categories, isLoading: isCategoriesLoading } = useCategories();
 
   // URL Params Sync
   const initialCategory = searchParams?.get('category') || '';
@@ -474,22 +473,39 @@ function ProductsContent() {
             <div>
               <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Category</label>
               <div className="space-y-1.5 max-h-36 overflow-y-auto pr-2 scrollbar-none">
-                {['all', 'smartphones', 'laptops', 'fragrances', 'skincare', 'groceries', 'home-decoration'].map((cat) => {
-                  const active = selectedCategory === (cat === 'all' ? '' : cat);
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat === 'all' ? '' : cat)}
-                      className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                        active
-                          ? 'bg-indigo-50 text-[#3b42c4] font-bold border-l-2 border-[#3b42c4]'
-                          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
-                      }`}
-                    >
-                      {cat.replace('-', ' ')}
-                    </button>
-                  );
-                })}
+                <button
+                  onClick={() => setSelectedCategory('')}
+                  className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    selectedCategory === ''
+                      ? 'bg-indigo-50 text-[#3b42c4] font-bold border-l-2 border-[#3b42c4]'
+                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                  }`}
+                >
+                  All Products
+                </button>
+                {isCategoriesLoading ? (
+                  <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-400">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <span>Loading...</span>
+                  </div>
+                ) : (
+                  categories?.map((cat) => {
+                    const active = selectedCategory === cat.slug;
+                    return (
+                      <button
+                        key={cat.slug}
+                        onClick={() => setSelectedCategory(cat.slug)}
+                        className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                          active
+                            ? 'bg-indigo-50 text-[#3b42c4] font-bold border-l-2 border-[#3b42c4]'
+                            : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                        }`}
+                      >
+                        {cat.name}
+                      </button>
+                    );
+                  })
+                )}
               </div>
             </div>
 
