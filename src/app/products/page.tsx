@@ -423,16 +423,19 @@ function ProductsContent() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
           {/* Filters Sidebar */}
-          <aside className="lg:col-span-1 bg-white border border-slate-200/60 p-6 rounded-3xl shadow-sm h-fit space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <span className="font-extrabold text-slate-800 text-sm tracking-wide uppercase flex items-center gap-1.5">
-                <SlidersHorizontal className="w-4 h-4 text-slate-500" />
+          <aside
+            className="lg:col-span-1 h-fit rounded-2xl overflow-hidden shadow-md"
+            style={{ border: '1px solid rgba(59,66,196,0.14)', background: 'linear-gradient(160deg,#ffffff 0%,#f8f9ff 100%)' }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(59,66,196,0.1)', background: 'rgba(59,66,196,0.04)' }}>
+              <span className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-[#3b42c4]" />
                 Filters
               </span>
-              {(selectedCategory || selectedBrands.length > 0 || minRating > 0 || onlyInStock || minDiscount > 0 || selectedColors.length > 0 || selectedSizes.length > 0 || activeSmartFilter) && (
+              {(selectedBrands.length > 0 || minRating > 0 || onlyInStock || minDiscount > 0 || selectedColors.length > 0 || selectedSizes.length > 0 || activeSmartFilter || priceRange < 2000) && (
                 <button
                   onClick={() => {
-                    setSelectedCategory('');
                     setSelectedBrands([]);
                     setMinRating(0);
                     setOnlyInStock(false);
@@ -442,166 +445,124 @@ function ProductsContent() {
                     setActiveSmartFilter(null);
                     setPriceRange(2000);
                   }}
-                  className="text-[10px] font-black text-rose-500 hover:text-rose-600 uppercase tracking-wider cursor-pointer"
+                  className="text-[10px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-wider cursor-pointer px-2.5 py-1 rounded-lg hover:bg-rose-50 transition-all"
                 >
                   Clear All
                 </button>
               )}
             </div>
+            <div className="p-5 space-y-5">
 
             {/* Price Slider */}
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                Price Cap: <span className="text-[#3b42c4] font-black">${priceRange}</span>
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Price Range</label>
+                <span className="text-xs font-black text-[#3b42c4] bg-indigo-50 px-2.5 py-0.5 rounded-full">${priceRange.toLocaleString()}</span>
+              </div>
               <input
                 type="range"
                 min="10"
                 max="2000"
-                step="20"
+                step="10"
                 value={priceRange}
                 onChange={(e) => setPriceRange(Number(e.target.value))}
-                className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-[#3b42c4]"
+                className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#3b42c4]"
+                style={{ background: `linear-gradient(to right, #3b42c4 0%, #3b42c4 ${((priceRange - 10) / (2000 - 10)) * 100}%, #e2e8f0 ${((priceRange - 10) / (2000 - 10)) * 100}%, #e2e8f0 100%)` }}
               />
-              <div className="flex justify-between text-[10px] text-slate-400 font-bold mt-1">
+              <div className="flex justify-between text-[10px] text-slate-400 font-semibold mt-1.5">
                 <span>$10</span>
                 <span>$2,000</span>
               </div>
             </div>
+            <div style={{ borderTop: '1px solid rgba(59,66,196,0.08)' }} />
 
-            {/* Categories */}
-            <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Category</label>
-              <div className="space-y-1.5 max-h-36 overflow-y-auto pr-2 scrollbar-none">
-                <button
-                  onClick={() => setSelectedCategory('')}
-                  className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    selectedCategory === ''
-                      ? 'bg-indigo-50 text-[#3b42c4] font-bold border-l-2 border-[#3b42c4]'
-                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
-                  }`}
-                >
-                  All Products
-                </button>
-                {isCategoriesLoading ? (
-                  <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-400">
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                    <span>Loading...</span>
-                  </div>
-                ) : (
-                  categories?.map((cat) => {
-                    const active = selectedCategory === cat.slug;
-                    return (
-                      <button
-                        key={cat.slug}
-                        onClick={() => setSelectedCategory(cat.slug)}
-                        className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                          active
-                            ? 'bg-indigo-50 text-[#3b42c4] font-bold border-l-2 border-[#3b42c4]'
-                            : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
-                        }`}
-                      >
-                        {cat.name}
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-            </div>
 
-            {/* Brands Checkboxes */}
+
+            {/* Brands */}
             {uniqueBrands.length > 0 && (
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Brands</label>
-                <div className="space-y-2 max-h-40 overflow-y-auto pr-2 scrollbar-none">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Brand</label>
+                <div className="space-y-2 max-h-44 overflow-y-auto pr-1 scrollbar-none">
                   {uniqueBrands.map((brand) => {
                     const isChecked = selectedBrands.includes(brand);
                     return (
-                      <label key={brand} className="flex items-center gap-2 text-xs font-medium text-slate-600 cursor-pointer hover:text-slate-800">
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {
-                            setSelectedBrands((prev) =>
-                              isChecked ? prev.filter((b) => b !== brand) : [...prev, brand]
-                            );
-                          }}
-                          className="rounded border-slate-300 text-[#3b42c4] focus:ring-[#3b42c4]"
-                        />
-                        <span>{brand}</span>
+                      <label key={brand} className="flex items-center gap-2.5 cursor-pointer group" onClick={() => setSelectedBrands(prev => isChecked ? prev.filter(b => b !== brand) : [...prev, brand])}>
+                        <div className={`w-4 h-4 rounded-[5px] border-2 flex items-center justify-center shrink-0 transition-all ${isChecked ? 'bg-[#3b42c4] border-[#3b42c4]' : 'border-slate-300 bg-white group-hover:border-[#3b42c4]/60'}`}>
+                          {isChecked && <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>}
+                        </div>
+                        <span className={`text-xs font-medium transition-colors ${isChecked ? 'text-[#3b42c4] font-semibold' : 'text-slate-600 group-hover:text-slate-800'}`}>{brand}</span>
                       </label>
                     );
                   })}
                 </div>
               </div>
             )}
+            <div style={{ borderTop: '1px solid rgba(59,66,196,0.08)' }} />
 
-            {/* Rating Stars Selection */}
+            {/* Minimum Rating */}
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Minimum Rating</label>
-              <div className="flex items-center gap-1">
+              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Minimum Rating</label>
+              <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((stars) => (
                   <button
                     key={stars}
                     onClick={() => setMinRating(stars === minRating ? 0 : stars)}
-                    className="p-1 hover:scale-110 transition-transform cursor-pointer"
+                    className="p-1 hover:scale-125 transition-transform cursor-pointer"
                   >
-                    <Star className={`w-5 h-5 ${stars <= minRating ? 'text-amber-500 fill-current' : 'text-slate-200'}`} />
+                    <Star className={`w-5 h-5 transition-colors ${stars <= minRating ? 'text-amber-400 fill-amber-400' : 'text-slate-200 hover:text-amber-300'}`} />
                   </button>
                 ))}
-                {minRating > 0 && <span className="text-[10px] text-slate-400 font-bold ml-1">{minRating}+ Stars</span>}
+                {minRating > 0 && <span className="ml-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">{minRating}+ ★</span>}
               </div>
             </div>
+            <div style={{ borderTop: '1px solid rgba(59,66,196,0.08)' }} />
 
             {/* Availability */}
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Availability</label>
-              <label className="flex items-center gap-2 text-xs font-medium text-slate-600 cursor-pointer hover:text-slate-800">
-                <input
-                  type="checkbox"
-                  checked={onlyInStock}
-                  onChange={(e) => setOnlyInStock(e.target.checked)}
-                  className="rounded border-slate-300 text-[#3b42c4] focus:ring-[#3b42c4]"
-                />
-                <span>In Stock only</span>
+              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Availability</label>
+              <label className="flex items-center gap-2.5 cursor-pointer group" onClick={() => setOnlyInStock(p => !p)}>
+                <div className={`w-4 h-4 rounded-[5px] border-2 flex items-center justify-center shrink-0 transition-all ${onlyInStock ? 'bg-[#3b42c4] border-[#3b42c4]' : 'border-slate-300 bg-white group-hover:border-[#3b42c4]/60'}`}>
+                  {onlyInStock && <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>}
+                </div>
+                <span className={`text-xs font-medium cursor-pointer transition-colors ${onlyInStock ? 'text-[#3b42c4] font-semibold' : 'text-slate-600 group-hover:text-slate-800'}`}>In Stock Only</span>
               </label>
             </div>
+            <div style={{ borderTop: '1px solid rgba(59,66,196,0.08)' }} />
 
-            {/* Discount Filter */}
+            {/* Discount */}
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Discount percentage</label>
-              <div className="flex gap-2">
+              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Min. Discount</label>
+              <div className="grid grid-cols-4 gap-1.5">
                 {[0, 5, 10, 15].map((disc) => (
                   <button
                     key={disc}
                     onClick={() => setMinDiscount(disc)}
-                    className={`flex-1 py-1 border text-xs font-semibold rounded-lg transition-all ${
-                      minDiscount === disc
-                        ? 'bg-[#3b42c4] border-[#3b42c4] text-white'
-                        : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-                    }`}
+                    className={`py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${minDiscount === disc ? 'text-white shadow-sm' : 'text-slate-500 hover:text-[#3b42c4]'}`}
+                    style={minDiscount === disc
+                      ? { background: 'linear-gradient(135deg,#3b42c4,#6366f1)', border: '1px solid rgba(99,102,241,0.4)' }
+                      : { background: '#f8f9ff', border: '1px solid rgba(59,66,196,0.15)' }}
                   >
                     {disc === 0 ? 'Any' : `${disc}%+`}
                   </button>
                 ))}
               </div>
             </div>
+            <div style={{ borderTop: '1px solid rgba(59,66,196,0.08)' }} />
 
-            {/* Color Filters */}
+            {/* Colors */}
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Colors</label>
+              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Color</label>
               <div className="flex flex-wrap gap-1.5">
                 {MOCK_COLORS.map((col) => {
                   const isSel = selectedColors.includes(col);
                   return (
                     <button
                       key={col}
-                      onClick={() => {
-                        setSelectedColors(prev => isSel ? prev.filter(c => c !== col) : [...prev, col]);
-                      }}
-                      className={`text-[10px] px-2.5 py-1 border rounded-lg font-semibold transition-all ${
-                        isSel ? 'bg-[#3b42c4] border-[#3b42c4] text-white' : 'bg-slate-50 border-slate-200 text-slate-500'
-                      }`}
+                      onClick={() => setSelectedColors(prev => isSel ? prev.filter(c => c !== col) : [...prev, col])}
+                      className={`text-[11px] px-3 py-1.5 rounded-full font-semibold transition-all cursor-pointer ${isSel ? 'text-white shadow-sm' : 'text-slate-500 hover:text-[#3b42c4]'}`}
+                      style={isSel
+                        ? { background: 'linear-gradient(135deg,#3b42c4,#6366f1)', border: '1px solid rgba(99,102,241,0.4)' }
+                        : { background: '#f8f9ff', border: '1px solid rgba(59,66,196,0.15)' }}
                     >
                       {col}
                     </button>
@@ -609,22 +570,22 @@ function ProductsContent() {
                 })}
               </div>
             </div>
+            <div style={{ borderTop: '1px solid rgba(59,66,196,0.08)' }} />
 
-            {/* Size Filters */}
+            {/* Sizes */}
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Size Options</label>
+              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Size</label>
               <div className="flex flex-wrap gap-1.5">
                 {MOCK_SIZES.map((sz) => {
                   const isSel = selectedSizes.includes(sz);
                   return (
                     <button
                       key={sz}
-                      onClick={() => {
-                        setSelectedSizes(prev => isSel ? prev.filter(s => s !== sz) : [...prev, sz]);
-                      }}
-                      className={`text-[10px] px-2.5 py-1 border rounded-lg font-semibold transition-all ${
-                        isSel ? 'bg-[#3b42c4] border-[#3b42c4] text-white' : 'bg-slate-50 border-slate-200 text-slate-500'
-                      }`}
+                      onClick={() => setSelectedSizes(prev => isSel ? prev.filter(s => s !== sz) : [...prev, sz])}
+                      className={`text-[11px] px-3 py-1.5 rounded-full font-bold transition-all cursor-pointer ${isSel ? 'text-white shadow-sm' : 'text-slate-500 hover:text-[#3b42c4]'}`}
+                      style={isSel
+                        ? { background: 'linear-gradient(135deg,#3b42c4,#6366f1)', border: '1px solid rgba(99,102,241,0.4)' }
+                        : { background: '#f8f9ff', border: '1px solid rgba(59,66,196,0.15)' }}
                     >
                       {sz}
                     </button>
@@ -632,6 +593,8 @@ function ProductsContent() {
                 })}
               </div>
             </div>
+
+            </div>{/* end p-5 */}
           </aside>
 
           {/* Right Product Grid Column */}
