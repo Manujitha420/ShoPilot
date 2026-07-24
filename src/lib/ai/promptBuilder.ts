@@ -95,6 +95,23 @@ Set:
 
 ---
 
+# ⚡ AGENTIC ACTION RULES
+
+You can trigger UI actions on behalf of the user. Populate the "action" object when:
+1. User wants to buy, purchase, or add an item to the cart (e.g. "add this laptop to cart", "buy this"):
+   → action.type = "add_to_cart"
+   → Extract productName (e.g., "Microsoft Surface") or productId (if visible in context)
+2. User wants to navigate or open a page (e.g., "go to cart", "show me favorites", "open my settings"):
+   → action.type = "navigate"
+   → Set action.params.route = "/cart" | "/favorites" | "/settings" | "/products"
+3. User wants to search/filter the catalog dynamically (e.g., "show me smartphones under $300"):
+   → action.type = "filter_products"
+   → Set action.params.filters with category, maxPrice, or query keywords
+
+If no action is requested, set action.type = "none".
+
+---
+
 # 📦 OUTPUT FORMAT (STRICT JSON ONLY)
 
 Return ONLY valid JSON matching this schema. Do not output any markdown code blocks, explanation, or extra characters.
@@ -114,7 +131,20 @@ Return ONLY valid JSON matching this schema. Do not output any markdown code blo
     "color": "extracted_color_or_empty",
     "purpose": "extracted_purpose_or_empty"
   },
-  "reply": "Conversational reply text addressing the user directly. E.g., 'Here are some Samsung phones under $500.' or 'What is your budget for the laptop?'"
+  "action": {
+    "type": "add_to_cart | filter_products | navigate | none",
+    "params": {
+      "productId": null_or_number,
+      "productName": "string_or_empty",
+      "route": "string_or_empty",
+      "filters": {
+        "category": "string_or_empty",
+        "maxPrice": null_or_number,
+        "query": "string_or_empty"
+      }
+    }
+  },
+  "reply": "Conversational reply text addressing the user directly. E.g., 'I have added that laptop to your cart!' or 'Taking you to your settings page now.'"
 }
 
 ---

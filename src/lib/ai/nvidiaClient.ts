@@ -124,6 +124,7 @@ function generateLocalMockResponse(prompt: string): any {
         color: '',
         purpose: '',
       },
+      action: null as any,
       reply: '',
     };
 
@@ -132,6 +133,91 @@ function generateLocalMockResponse(prompt: string): any {
       response.intent = 'greeting';
       response.reply = "Hello! I'm ShoPilot, your AI-powered shopping assistant. I can help you search for products, compare specs, or recommend items. What are you looking for today?";
       return response;
+    }
+
+    // Agentic Actions Navigations
+    if (msgLower.includes('setting') || msgLower.includes('profile')) {
+      response.intent = 'app_question';
+      response.requiresApiCall = false;
+      response.apiAction = 'none';
+      response.action = {
+        type: 'navigate',
+        params: { route: '/settings' }
+      };
+      response.reply = 'Opening your settings page...';
+      return response;
+    }
+
+    if (msgLower.includes('cart') && (msgLower.includes('go to') || msgLower.includes('open') || msgLower.includes('show') || msgLower.includes('view') || msgLower.includes('take me'))) {
+      response.intent = 'app_question';
+      response.requiresApiCall = false;
+      response.apiAction = 'none';
+      response.action = {
+        type: 'navigate',
+        params: { route: '/cart' }
+      };
+      response.reply = 'Taking you to your shopping cart now.';
+      return response;
+    }
+
+    if (msgLower.includes('favorite') || msgLower.includes('favourite')) {
+      response.intent = 'app_question';
+      response.requiresApiCall = false;
+      response.apiAction = 'none';
+      response.action = {
+        type: 'navigate',
+        params: { route: '/favorites' }
+      };
+      response.reply = 'Opening your favorites list.';
+      return response;
+    }
+
+    // Agentic Actions Cart Addition
+    if ((msgLower.includes('add') && (msgLower.includes('cart') || msgLower.includes('basket'))) || msgLower.includes('buy this') || msgLower.includes('purchase this')) {
+      response.intent = 'recommendation';
+      response.requiresApiCall = false;
+      response.apiAction = 'none';
+      response.action = {
+        type: 'add_to_cart',
+        params: {} // Hook will automatically read active single/context products if empty
+      };
+      response.reply = "I've added the product to your cart!";
+      return response;
+    }
+
+    // Agentic Actions Filter Sync
+    if (msgLower.includes('show') || msgLower.includes('find') || msgLower.includes('filter') || msgLower.includes('search')) {
+      let category = '';
+      if (msgLower.includes('laptop') || msgLower.includes('computer') || msgLower.includes('pc')) category = 'laptops';
+      else if (msgLower.includes('phone') || msgLower.includes('smartphone') || msgLower.includes('iphone') || msgLower.includes('samsung')) category = 'smartphones';
+      else if (msgLower.includes('perfume') || msgLower.includes('fragrance') || msgLower.includes('cologne')) category = 'fragrances';
+      else if (msgLower.includes('skin') || msgLower.includes('skincare')) category = 'skincare';
+      else if (msgLower.includes('grocer') || msgLower.includes('food')) category = 'groceries';
+      else if (msgLower.includes('furniture') || msgLower.includes('chair') || msgLower.includes('table')) category = 'furniture';
+      
+      let maxPrice: number | null = null;
+      const underMatch = msgLower.match(/under\s*\$?\s*(\d+)/) || msgLower.match(/less\s*than\s*\$?\s*(\d+)/) || msgLower.match(/below\s*\$?\s*(\d+)/);
+      if (underMatch) {
+        maxPrice = parseInt(underMatch[1], 10);
+      }
+
+      if (category || maxPrice) {
+        response.intent = 'product_search';
+        response.requiresApiCall = false;
+        response.apiAction = 'none';
+        response.action = {
+          type: 'filter_products',
+          params: {
+            filters: {
+              category,
+              maxPrice,
+              query: ''
+            }
+          }
+        };
+        response.reply = `Filtering list to show ${category || 'products'} ${maxPrice ? `under $${maxPrice}` : ''}...`;
+        return response;
+      }
     }
 
     // Gratitude / thanks

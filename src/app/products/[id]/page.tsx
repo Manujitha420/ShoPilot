@@ -37,6 +37,7 @@ import {
   Award
 } from 'lucide-react';
 import aiService from '@/services/ai.service';
+import { useAgenticActions } from '@/hooks/useAgenticActions';
 
 interface SummaryResult {
   summary: string;
@@ -61,6 +62,7 @@ export default function ProductDetailPage() {
   const { data: product, isLoading, error } = useProduct(productId);
   const { isFavorite, toggleFavorite } = useFavorites();
   const { isAuthenticated } = useAuth();
+  const { executeAction } = useAgenticActions();
 
   // Fetch related products in the same category
   const { data: relatedData } = useProducts({
@@ -103,7 +105,13 @@ export default function ProductDetailPage() {
 
   // Product Chat Widget states
   const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMsg[]>([
+    {
+      id: 'welcome',
+      role: 'assistant',
+      content: "👋 Hi! I'm your ShoPilot AI Assistant. Ask me anything about this product!"
+    }
+  ]);
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -185,8 +193,10 @@ export default function ProductDetailPage() {
 
   // Scroll chat widget to bottom
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages, chatLoading]);
+    if (chatOpen) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, chatLoading, chatOpen]);
 
   if (error) {
     return (
@@ -367,6 +377,10 @@ export default function ProductDetailPage() {
         role: 'assistant',
         content: data.reply || "I'm sorry, I couldn't process that query."
       }]);
+
+      if (data.action) {
+        await executeAction(data.action, product);
+      }
     } catch (err: any) {
       setChatMessages(prev => [...prev, {
         id: Math.random().toString(),
@@ -992,32 +1006,41 @@ export default function ProductDetailPage() {
 
           {/* Chat Panel Drawer */}
           <div
-            className={`fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] bg-white border border-slate-200 rounded-[24px] shadow-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right ${
-              chatOpen ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'
+            className={`fixed bottom-[88px] right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right ${
+              chatOpen ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 translate-y-4 pointer-events-none'
             }`}
-            style={{ height: 480 }}
+            style={{
+              height: 490,
+              background: 'linear-gradient(160deg, #0f172a 0%, #0c1120 100%)',
+              border: '1px solid rgba(99, 102, 241, 0.25)',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset',
+            }}
           >
             {/* Header */}
-            <div className="bg-slate-50 border-b border-slate-200 px-4 py-3.5 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 shadow-2xs">
-                  <Sparkles className="w-4.5 h-4.5 animate-pulse" />
+            <div style={{ background: 'rgba(15,23,42,0.9)', borderBottom: '1px solid rgba(99,102,241,0.2)' }} className="px-4 py-3 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0" style={{ background: 'linear-gradient(135deg, #6366f1, #22d3ee)' }}>
+                  <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-black text-slate-800 tracking-tight leading-none">shoPilot AI Assistant</h3>
-                  <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5 block">Product Context active</span>
+                  <h3 className="font-semibold text-white text-sm leading-none">ShoPilot AI</h3>
+                  <span className="flex items-center gap-1.5 mt-1">
+                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                    <span className="text-[10px] text-emerald-400 font-medium tracking-wide">Product Context Active</span>
+                  </span>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setChatOpen(false)}
-                className="p-1.5 hover:bg-slate-200/60 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Message Pane */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-hud">
               {chatMessages.map((msg) => (
                 <div
                   key={msg.id}
@@ -1026,24 +1049,32 @@ export default function ProductDetailPage() {
                   }`}
                 >
                   <div
-                    className={`px-3.5 py-2.5 rounded-2xl text-xs md:text-sm font-semibold leading-relaxed shadow-3xs ${
+                    className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed font-medium ${
                       msg.role === 'user'
-                        ? 'bg-indigo-600 text-white rounded-br-none'
+                        ? 'text-white rounded-br-none'
                         : msg.isError
-                        ? 'bg-rose-50 border border-rose-200 text-rose-800 rounded-bl-none'
-                        : 'bg-white border border-slate-200/80 text-slate-700 rounded-bl-none'
+                        ? 'text-red-300 rounded-bl-none'
+                        : 'text-slate-100 rounded-bl-none'
                     }`}
+                    style={
+                      msg.role === 'user'
+                        ? { background: 'linear-gradient(135deg,#4f46e5,#6366f1)', border: '1px solid rgba(99,102,241,0.5)' }
+                        : msg.isError
+                        ? { background: 'rgba(220,38,38,0.12)', border: '1px solid rgba(220,38,38,0.25)' }
+                        : { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }
+                    }
                   >
                     {msg.content}
                   </div>
                 </div>
               ))}
               {chatLoading && (
-                <div className="mr-auto max-w-[85%] flex items-start gap-1">
-                  <div className="bg-white border border-slate-200 px-3.5 py-2.5 rounded-2xl rounded-bl-none flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className="mr-auto max-w-[85%] flex items-center gap-2">
+                  <div className="px-3.5 py-2.5 rounded-2xl rounded-bl-none flex items-center gap-2 text-[12px] text-slate-300 font-medium"
+                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               )}
@@ -1051,19 +1082,21 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Input Form */}
-            <div className="p-3 border-t border-slate-200 bg-white flex items-center gap-2">
+            <div style={{ borderTop: '1px solid rgba(99,102,241,0.2)', background: 'rgba(10,12,24,0.8)' }} className="p-3 flex items-center gap-2 shrink-0">
               <input
                 type="text"
                 placeholder="Ask about this product..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
-                className="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-xs font-medium focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                className="flex-1 text-white text-xs rounded-xl px-4 py-2.5 outline-none transition-all placeholder-slate-500 font-medium"
+                style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(99,102,241,0.25)' }}
               />
               <button
                 onClick={handleSendChat}
                 disabled={!chatInput.trim() || chatLoading}
-                className="p-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl shadow-xs transition-colors cursor-pointer"
+                className="p-2.5 text-white rounded-xl transition-all cursor-pointer disabled:cursor-not-allowed shrink-0 disabled:opacity-40"
+                style={{ background: 'linear-gradient(135deg,#4f46e5,#6366f1)' }}
               >
                 <Send className="w-4 h-4" />
               </button>

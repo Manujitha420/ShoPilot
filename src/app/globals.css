@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -40,6 +41,95 @@ body {
   100% { transform: translateY(0) scale(1); }
 }
 
+
+
 .btn-catch-anim { 
   animation: btn-catch 0.5s ease-out forwards; 
 }
+
+/* ─── Futuristic HUD Styles ─── */
+body {
+  font-family: 'Inter', Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Custom Scrollbar for HUD panels */
+.scrollbar-hud::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.scrollbar-hud::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.3);
+}
+.scrollbar-hud::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 99px;
+}
+.scrollbar-hud::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.8);
+}
+
+/* HUD Glassmorphism Panel */
+.hud-glass {
+  background: rgba(10, 15, 30, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Neon Glow Outline */
+.hud-glow-indigo {
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+}
+
+.hud-glow-cyan {
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+}
+
+/* Radar Pulse effect */
+@keyframes radar-ping {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.radar-ring {
+  position: absolute;
+  border: 1.5px solid rgba(6, 182, 212, 0.5);
+  border-radius: 50%;
+  animation: radar-ping 2s cubic-bezier(0.21, 0.85, 0.49, 0.98) infinite;
+}
+
+/* Glitch/Text Glow utility */
+.text-hud-glow {
+  text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+}
+
+.text-hud-glow-indigo {
+  text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+}
+
+/* Hologram Scanning Line */
+@keyframes scan-line {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+
+.hologram-scanner {
+  overflow: hidden;
+}
+.hologram-scanner::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(6, 182, 212, 0.5), transparent);
+  animation: scan-line 6s linear infinite;
+  pointer-events: none;
+}
+
