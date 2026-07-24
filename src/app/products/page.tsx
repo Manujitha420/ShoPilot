@@ -617,7 +617,6 @@ function ProductsContent() {
                   <option value="price-desc">Price: High to Low</option>
                   <option value="newest">Newest Catalog Items</option>
                   <option value="rating-desc">Highest Rated First</option>
-                  <option value="ai-recommended">AI Match Recommended</option>
                   <option value="best-deals">Best Discount Deals</option>
                 </select>
               </div>
