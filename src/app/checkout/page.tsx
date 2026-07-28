@@ -200,7 +200,7 @@ export default function CheckoutPage() {
   };
 
   // Form submission handler
-  const handlePurchase = (e: React.FormEvent) => {
+  const handlePurchase = async (e: React.FormEvent) => {
     e.preventDefault();
     const errors: string[] = [];
 
@@ -233,14 +233,41 @@ export default function CheckoutPage() {
     }
 
     setFormErrors([]);
-    // Success flow
-    const confirmId = `SP-${Math.floor(100000 + Math.random() * 900000)}-AI`;
-    setOrderId(confirmId);
-    setShowSuccessModal(true);
 
-    // Clear cart on successful purchase
-    localStorage.removeItem('shopilot_cart');
-    window.dispatchEvent(new Event('shopilot_cart_update'));
+    // Call server-side checkout validation endpoint to re-calculate canonical catalog prices
+    try {
+      const validationPayload = {
+        items: cartItems.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+        })),
+        discountCode: appliedPromo,
+      };
+
+      const res = await fetch('/api/checkout/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(validationPayload),
+      });
+
+      const validationData = await res.json();
+      if (!res.ok || !validationData.success) {
+        triggerToast(validationData.error || 'Server price validation failed.');
+        return;
+      }
+
+      // Order validated successfully with server recalculation
+      const confirmId = `SP-${Math.floor(100000 + Math.random() * 900000)}-AI`;
+      setOrderId(confirmId);
+      setShowSuccessModal(true);
+
+      // Clear cart on successful purchase
+      localStorage.removeItem('shopilot_cart');
+      window.dispatchEvent(new Event('shopilot_cart_update'));
+    } catch (err) {
+      console.error('Checkout error:', err);
+      triggerToast('Failed to validate order with server.');
+    }
   };
 
   return (
