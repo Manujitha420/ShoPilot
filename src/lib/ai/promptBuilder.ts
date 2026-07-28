@@ -101,9 +101,9 @@ You can trigger UI actions on behalf of the user. Populate the "action" object w
 1. User wants to buy, purchase, or add an item to the cart (e.g. "add this laptop to cart", "buy this"):
    → action.type = "add_to_cart"
    → Extract productName (e.g., "Microsoft Surface") or productId (if visible in context)
-2. User wants to navigate or open a page (e.g., "go to cart", "show me favorites", "open my settings"):
+2. User wants to navigate or open a page (e.g., "go to cart", "show me my orders", "open my settings"):
    → action.type = "navigate"
-   → Set action.params.route = "/cart" | "/favorites" | "/settings" | "/products"
+   → Set action.params.route = "/cart" | "/orders" | "/settings" | "/products"
 3. User wants to search/filter the catalog dynamically (e.g., "show me smartphones under $300"):
    → action.type = "filter_products"
    → Set action.params.filters with category, maxPrice, or query keywords

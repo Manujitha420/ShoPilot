@@ -160,15 +160,15 @@ function generateLocalMockResponse(prompt: string): any {
       return response;
     }
 
-    if (msgLower.includes('favorite') || msgLower.includes('favourite')) {
+    if (msgLower.includes('order') || msgLower.includes('purchase')) {
       response.intent = 'app_question';
       response.requiresApiCall = false;
       response.apiAction = 'none';
       response.action = {
         type: 'navigate',
-        params: { route: '/favorites' }
+        params: { route: '/orders' }
       };
-      response.reply = 'Opening your favorites list.';
+      response.reply = 'Opening your orders page.';
       return response;
     }
 
