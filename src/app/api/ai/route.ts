@@ -2,13 +2,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import { callNvidiaAI } from '@/lib/ai/nvidiaClient';
 import { buildChatPrompt, buildProductSummaryPrompt, buildProductComparisonPrompt } from '@/lib/ai/promptBuilder';
 import productService from '@/services/product.service';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 /**
  * AI Proxy Route Handler.
  * Integrates Nvidia Llama-3.3-70b-instruct to provide summaries, comparisons, and conversational shopping logic.
+ * Rate limited to 15 requests per minute per client IP to prevent quota exhaustion.
  */
 export async function POST(req: NextRequest) {
   try {
+    // Extract Client IP address for rate limiting
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || req.headers.get('x-real-ip') || 'anonymous_client';
+
+    // Rate limit check: Max 15 requests per 60 seconds per IP
+    const rateLimit = checkRateLimit(ip, { limit: 15, windowMs: 60000 });
+
+    if (!rateLimit.isAllowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Too many AI requests. Please wait ${Math.ceil(rateLimit.resetMs / 1000)} seconds before trying again.`,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': Math.ceil(rateLimit.resetMs / 1000).toString(),
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': '0',
+          },
+        }
+      );
+    }
+
     const body = await req.json();
     const { type } = body;
 
@@ -59,14 +84,12 @@ export async function POST(req: NextRequest) {
               });
               let list = res.products;
               
-              // Apply brand filters locally
               if (filters.brand) {
                 list = list.filter((p) => 
                   p.brand?.toLowerCase().includes(filters.brand.toLowerCase())
                 );
               }
               
-              // Apply price filters locally
               if (filters.maxPrice) {
                 list = list.filter((p) => p.price <= filters.maxPrice);
               }
@@ -74,9 +97,8 @@ export async function POST(req: NextRequest) {
                 list = list.filter((p) => p.price >= filters.minPrice);
               }
 
-              products = list.slice(0, 4); // return top 4 matches
+              products = list.slice(0, 4);
             } else if (filters.query) {
-              // If a general search keyword is specified
               const res = await productService.searchProducts({
                 query: filters.query,
                 limit: 10,
@@ -89,12 +111,10 @@ export async function POST(req: NextRequest) {
 
               products = list.slice(0, 4);
             } else {
-              // Return generic products
               const res = await productService.getProducts({ limit: 4 });
               products = res.products;
             }
           } else if (action === 'featured_products') {
-            // Get highest rated products
             const res = await productService.getProducts({
               limit: 4,
               sortBy: 'rating',
@@ -104,7 +124,6 @@ export async function POST(req: NextRequest) {
           }
         } catch (apiErr) {
           console.error('Error fetching live products for AI assistant:', apiErr);
-          // Return empty array instead of failing the request
         }
       }
 
