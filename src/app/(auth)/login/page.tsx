@@ -5,8 +5,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { User, Eye, EyeOff, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import AuthHeader from '@/components/layout/AuthHeader';
-import AuthFooter from '@/components/layout/AuthFooter';
 
 function LoginFormContent() {
   const { login, error, isLoggingIn, isAuthenticated } = useAuth();
@@ -147,17 +145,15 @@ function LoginFormContent() {
             </div>
           </div>
 
-          {/* Remember Me with expanding outline cool transition */}
+          {/* Remember Me */}
           <div
             className="flex items-center select-none cursor-pointer group w-fit"
             onClick={() => setRememberMe(!rememberMe)}
           >
             <div className="relative flex items-center justify-center w-6 h-6">
-              {/* Expanding outline background element */}
               <div className={`absolute inset-0 rounded-lg bg-[#3b42c4]/15 transition-all duration-500 ease-out transform
                 ${rememberMe ? 'scale-[1.6] opacity-100' : 'scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-40'}`}
               />
-              {/* Checkbox box */}
               <div className={`relative w-4.5 h-4.5 rounded border transition-all duration-300 flex items-center justify-center z-10
                 ${rememberMe
                   ? 'border-[#3b42c4] bg-[#3b42c4]'
@@ -176,16 +172,13 @@ function LoginFormContent() {
             </span>
           </div>
 
-          {/* Submit Button with slide-up hover fill transition */}
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoggingIn}
             className="group relative w-full bg-black text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden cursor-pointer border border-black shadow-sm"
           >
-            {/* Slide background overlay from bottom to top */}
             <span className="absolute inset-x-0 bottom-0 h-0 bg-white transition-all duration-300 ease-out group-hover:h-full z-0" />
-
-            {/* Content */}
             <span className="relative z-10 flex items-center gap-2 transition-colors duration-600 group-hover:text-black">
               {isLoggingIn ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -209,9 +202,8 @@ function LoginFormContent() {
           </span>
         </div>
 
-        {/* Social Buttons with zoom zoom zoom hover effect */}
+        {/* Social Buttons */}
         <div className="grid grid-cols-3 gap-3">
-          {/* Google */}
           <button
             type="button"
             className="group flex items-center justify-center py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all cursor-pointer"
@@ -236,7 +228,6 @@ function LoginFormContent() {
             </svg>
           </button>
 
-          {/* Facebook */}
           <button
             type="button"
             className="group flex items-center justify-center py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all cursor-pointer"
@@ -246,7 +237,6 @@ function LoginFormContent() {
             </svg>
           </button>
 
-          {/* Apple */}
           <button
             type="button"
             className="group flex items-center justify-center py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all cursor-pointer"
@@ -269,7 +259,7 @@ function LoginFormContent() {
         </div>
       </div>
 
-      {/* Subtle developer demo credentials helper helper */}
+      {/* Developer Demo Accounts */}
       <div className="mt-6 p-4 bg-white/50 backdrop-blur-sm border border-slate-200/50 rounded-2xl text-slate-600 text-xs">
         <p className="font-bold mb-2 text-slate-700">Developer Demo Accounts:</p>
         <div className="flex gap-2">
@@ -295,25 +285,13 @@ function LoginFormContent() {
 
 export default function LoginPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#f5f6fa] text-slate-800">
-      <AuthHeader />
-
-      <main className="flex-1 flex items-center justify-center p-6 relative">
-        {/* Soft background glows */}
-        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
-
-        <Suspense fallback={
-          <div className="bg-white border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] p-10 max-w-md w-full flex flex-col items-center justify-center gap-4">
-            <Loader2 className="w-8 h-8 text-[#3b42c4] animate-spin" />
-            <p className="text-slate-500 font-semibold text-sm">Loading login portal...</p>
-          </div>
-        }>
-          <LoginFormContent />
-        </Suspense>
-      </main>
-
-      <AuthFooter />
-    </div>
+    <Suspense fallback={
+      <div className="bg-white border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] p-10 max-w-md w-full flex flex-col items-center justify-center gap-4">
+        <Loader2 className="w-8 h-8 text-[#3b42c4] animate-spin" />
+        <p className="text-slate-500 font-semibold text-sm">Loading login portal...</p>
+      </div>
+    }>
+      <LoginFormContent />
+    </Suspense>
   );
 }

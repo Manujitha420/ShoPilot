@@ -5,8 +5,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { User, Mail, Lock, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import AuthHeader from '@/components/layout/AuthHeader';
-import AuthFooter from '@/components/layout/AuthFooter';
 
 function RegisterFormContent() {
   const { register, error, isRegistering, isAuthenticated } = useAuth();
@@ -63,7 +61,6 @@ function RegisterFormContent() {
       const nameParts = fullName.trim().split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
-      // Generate a mock username using the email prefix and a random suffix
       const username = email.split('@')[0] + Math.floor(Math.random() * 1000);
 
       await register({
@@ -154,7 +151,7 @@ function RegisterFormContent() {
             </div>
           </div>
 
-          {/* Password & Confirm Password (2 Columns) */}
+          {/* Password & Confirm Password */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <div className="relative">
@@ -180,7 +177,6 @@ function RegisterFormContent() {
 
             <div>
               <div className="relative">
-                {/* Custom Reset-Lock SVG Icon */}
                 <svg
                   className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none"
                   viewBox="0 0 24 24"
@@ -214,17 +210,15 @@ function RegisterFormContent() {
             </div>
           </div>
 
-          {/* Agreement Checkbox with expanding outline cool transition */}
+          {/* Agreement Checkbox */}
           <div
             className="flex items-start select-none cursor-pointer group"
             onClick={() => setAgreeToTerms(!agreeToTerms)}
           >
             <div className="relative flex items-center justify-center w-6 h-6 shrink-0 mt-0.5">
-              {/* Expanding outline background element */}
               <div className={`absolute inset-0 rounded-lg bg-[#3b42c4]/15 transition-all duration-500 ease-out transform
                 ${agreeToTerms ? 'scale-[1.6] opacity-100' : 'scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-40'}`}
               />
-              {/* Checkbox box */}
               <div className={`relative w-4.5 h-4.5 rounded border transition-all duration-300 flex items-center justify-center z-10
                 ${agreeToTerms
                   ? 'border-[#3b42c4] bg-[#3b42c4]'
@@ -259,16 +253,13 @@ function RegisterFormContent() {
             </span>
           </div>
 
-          {/* Submit Button with slide-up hover fill transition */}
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={isRegistering}
             className="group relative w-full bg-black text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden cursor-pointer border border-black shadow-sm text-sm"
           >
-            {/* Slide background overlay from bottom to top */}
             <span className="absolute inset-x-0 bottom-0 h-0 bg-white transition-all duration-300 ease-out group-hover:h-full z-0" />
-            
-            {/* Content */}
             <span className="relative z-10 flex items-center gap-2 transition-colors duration-600 group-hover:text-black">
               {isRegistering ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -299,25 +290,13 @@ function RegisterFormContent() {
 
 export default function RegisterPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#f5f6fa] text-slate-800">
-      <AuthHeader />
-
-      <main className="flex-1 flex items-center justify-center p-6 relative">
-        {/* Soft background glows */}
-        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
-
-        <Suspense fallback={
-          <div className="bg-white border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] p-10 max-w-md w-full flex flex-col items-center justify-center gap-4">
-            <Loader2 className="w-8 h-8 text-[#3b42c4] animate-spin" />
-            <p className="text-slate-500 font-semibold text-sm">Loading registration portal...</p>
-          </div>
-        }>
-          <RegisterFormContent />
-        </Suspense>
-      </main>
-
-      <AuthFooter />
-    </div>
+    <Suspense fallback={
+      <div className="bg-white border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] p-10 max-w-md w-full flex flex-col items-center justify-center gap-4">
+        <Loader2 className="w-8 h-8 text-[#3b42c4] animate-spin" />
+        <p className="text-slate-500 font-semibold text-sm">Loading registration portal...</p>
+      </div>
+    }>
+      <RegisterFormContent />
+    </Suspense>
   );
 }
