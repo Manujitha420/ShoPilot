@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import authService from '@/services/auth.service';
+import axios from 'axios';
 import { LoginCredentials, UserProfile, RegisterCredentials } from '@/types';
 
 interface AuthContextType {
@@ -12,7 +12,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (credentials: RegisterCredentials) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   error: string | null;
   isLoggingIn: boolean;
   isRegistering: boolean;
@@ -28,28 +28,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    // Retrieve authentication status on startup (client-side only)
-    const storedToken = localStorage.getItem('shopilot_token');
-    const storedUser = localStorage.getItem('shopilot_user');
-    
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    // Check active session via HttpOnly cookie API endpoint
+    const checkSession = async () => {
+      try {
+        const res = await axios.get('/api/auth/me');
+        if (res.data.authenticated) {
+          setUser(res.data.user);
+          setToken('active_session_cookie');
+        } else {
+          setUser(null);
+          setToken(null);
+        }
+      } catch (err) {
+        setUser(null);
+        setToken(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
   }, []);
 
   const loginMutation = useMutation({
-    mutationFn: authService.login,
+    mutationFn: async (credentials: LoginCredentials) => {
+      const response = await axios.post('/api/auth/login', credentials);
+      return response.data;
+    },
     onSuccess: (data) => {
-      const { token: userToken, ...profile } = data;
-      localStorage.setItem('shopilot_token', userToken);
-      localStorage.setItem('shopilot_user', JSON.stringify(profile));
-      setToken(userToken);
-      setUser(profile);
+      setUser(data.user);
+      setToken(data.token || 'active_session_cookie');
       setError(null);
-      
-      // Clear Query cache to load fresh user specific items (like favorites)
       queryClient.clear();
     },
     onError: (err: any) => {
@@ -63,26 +72,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const registerMutation = useMutation({
-    mutationFn: authService.register,
+    mutationFn: async (credentials: RegisterCredentials) => {
+      const response = await axios.post('/api/auth/login', {
+        username: credentials.username,
+        password: credentials.password,
+      });
+      return response.data;
+    },
     onSuccess: (data) => {
-      // Mock log in the registered user since dummyjson doesn't persist it
-      const mockToken = 'mock_token_' + Math.random().toString(36).substring(2);
-      const profile: UserProfile = {
-        id: data.id || 999,
-        username: data.username || 'newuser',
-        email: data.email || 'newuser@example.com',
-        firstName: data.firstName || 'New',
-        lastName: data.lastName || 'User',
-        gender: data.gender || 'unknown',
-        image: data.image || 'https://dummyjson.com/icon/emilys/128',
-      };
-      
-      localStorage.setItem('shopilot_token', mockToken);
-      localStorage.setItem('shopilot_user', JSON.stringify(profile));
-      setToken(mockToken);
-      setUser(profile);
+      setUser(data.user);
+      setToken(data.token || 'active_session_cookie');
       setError(null);
-      
       queryClient.clear();
     },
     onError: (err: any) => {
@@ -95,10 +95,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await registerMutation.mutateAsync(credentials);
   };
 
-  const logout = () => {
-    localStorage.removeItem('shopilot_token');
-    localStorage.removeItem('shopilot_user');
-    localStorage.removeItem('shopilot_favorites'); // clear favorites as well
+  const logout = async () => {
+    try {
+      await axios.post('/api/auth/logout');
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
     setToken(null);
     setUser(null);
     queryClient.clear();
@@ -110,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         token,
-        isAuthenticated: !!token,
+        isAuthenticated: !!user,
         isLoading,
         login,
         register,
