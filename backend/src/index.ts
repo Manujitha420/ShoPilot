@@ -19,6 +19,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Welcome Root Route
+app.get('/', (req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    message: 'Welcome to ShoPilot Express Backend API',
+    health: '/health',
+    timestamp: new Date(),
+  });
+});
+
 // Health Check Endpoint
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', service: 'ShoPilot Express Backend API', timestamp: new Date() });
