@@ -957,11 +957,32 @@ export default function ProductDetailClient({ productId }: { productId: number }
       {product && (
         <>
           <button
+            id="chat-popup-toggle-btn-item"
             onClick={() => setChatOpen(!chatOpen)}
-            className="fixed bottom-6 right-6 z-50 p-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-2xl transition-transform hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2 group"
+            title="Open AI Chat Assistant"
+            className={`fixed bottom-6 right-6 z-50 text-white rounded-full shadow-xl cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center w-14 h-14 group ${
+              chatOpen ? 'bg-slate-700 hover:bg-slate-600 rotate-180' : 'bg-black hover:bg-slate-900'
+            }`}
           >
-            <MessageSquare className="w-6 h-6 shrink-0" />
-            <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 text-xs font-extrabold tracking-wide uppercase select-none">AI Chat</span>
+            {/* Pulsing ambient glow behind button */}
+            {!chatOpen && (
+              <span className="absolute -inset-1 bg-black/10 rounded-full animate-ping -z-10 group-hover:bg-[#3b42c4]/20 transition-all duration-300" />
+            )}
+
+            {chatOpen ? (
+              <svg className="w-6 h-6 transition-transform duration-300 group-hover:scale-90" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-7 h-7 transition-all duration-300 group-hover:rotate-12 group-hover:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="10" rx="2" />
+                <circle cx="12" cy="5" r="2" />
+                <path d="M12 7v4" />
+                <line x1="8" y1="16" x2="8" y2="16.01" />
+                <line x1="16" y1="16" x2="16" y2="16.01" />
+                <path d="M9 11v-2a3 3 0 0 1 6 0v2" />
+              </svg>
+            )}
           </button>
 
           <div
