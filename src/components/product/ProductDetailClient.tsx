@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import aiService from '@/services/ai.service';
 import { useAgenticActions } from '@/hooks/useAgenticActions';
+import { triggerCartToast } from '@/components/ui/Toast';
 
 interface SummaryResult {
   summary: string;
@@ -298,7 +299,9 @@ export default function ProductDetailClient({ productId }: { productId: number }
       if (actionName === 'buy') {
         router.push('/cart');
       } else {
-        setCartFeedback(`Added ${quantity} item(s) to Cart!`);
+        const msg = `Added ${quantity} ${quantity === 1 ? 'Item' : 'Items'} to Cart!`;
+        setCartFeedback(msg);
+        triggerCartToast(msg);
       }
     } catch (e) {
       console.error('Failed to update cart storage:', e);
@@ -437,14 +440,6 @@ export default function ProductDetailClient({ productId }: { productId: number }
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 relative">
       <Navbar />
-
-      {/* Cart Feedback Toast */}
-      {cartFeedback && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-slate-800 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-full shadow-2xl flex items-center gap-2 animate-bounce">
-          <Check className="w-4 h-4 text-emerald-400" />
-          <span>{cartFeedback}</span>
-        </div>
-      )}
 
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
         <button

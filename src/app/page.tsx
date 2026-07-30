@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
 import { useCartAnimation } from '@/hooks/useCartAnimation';
+import { triggerCartToast } from '@/components/ui/Toast';
 import aiService from '@/services/ai.service';
 import { useAgenticActions } from '@/hooks/useAgenticActions';
 import {
@@ -813,6 +814,7 @@ export default function HomePage() {
         
         localStorage.setItem('shopilot_cart', JSON.stringify(cartItems));
         window.dispatchEvent(new Event('shopilot_cart_update'));
+        triggerCartToast('Added 1 Item to Cart!');
       } catch (err) {}
     });
   };

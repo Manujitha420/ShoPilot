@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Product } from '@/types';
-import { Star, Heart, ArrowRightLeft, Sparkles } from 'lucide-react';
+import { Star, Heart, ArrowRightLeft, Sparkles, ShoppingCart } from 'lucide-react';
+import { triggerCartToast } from '@/components/ui/Toast';
 
 interface ProductCardProps {
   product: Product;
@@ -146,6 +147,37 @@ export default function ProductCard({
               }`}
             >
               <ArrowRightLeft className="w-4 h-4" />
+            </button>
+
+            {/* Quick Add to Cart Button */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                try {
+                  const cartData = localStorage.getItem('shopilot_cart');
+                  let cartItems: any[] = cartData ? JSON.parse(cartData) : [];
+                  const existingIndex = cartItems.findIndex((item: any) => item.product.id === product.id);
+                  if (existingIndex > -1) {
+                    cartItems[existingIndex].quantity += 1;
+                  } else {
+                    cartItems.push({
+                      product,
+                      quantity: 1,
+                      variant: 'Standard / Default'
+                    });
+                  }
+                  localStorage.setItem('shopilot_cart', JSON.stringify(cartItems));
+                  window.dispatchEvent(new Event('shopilot_cart_update'));
+                  triggerCartToast('Added 1 Item to Cart!');
+                } catch (err) {
+                  console.error(err);
+                }
+              }}
+              title="Add 1 Item to Cart"
+              className="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all cursor-pointer shadow-xs flex items-center justify-center"
+            >
+              <ShoppingCart className="w-4 h-4" />
             </button>
 
             {/* View Details Link */}

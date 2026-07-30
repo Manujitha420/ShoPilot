@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from '@/hooks/useAuth';
+import Toast from '@/components/ui/Toast';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  // Instantiate QueryClient in state to ensure it is isolated to the client session
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -23,6 +23,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <Toast />
         {children}
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />

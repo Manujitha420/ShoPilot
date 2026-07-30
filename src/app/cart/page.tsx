@@ -442,16 +442,53 @@ export default function CartPage() {
 
         {cartItems.length === 0 ? (
           /* Empty Cart State */
-          <div className="text-center py-20 bg-white border border-slate-200/80 rounded-3xl shadow-sm space-y-4">
-            <ShoppingCart className="w-16 h-16 text-slate-200 mx-auto animate-pulse" />
-            <h2 className="text-xl font-bold text-slate-800">Your cart is currently empty</h2>
-            <p className="text-slate-400 text-sm max-w-sm mx-auto">Add some items from our catalog to get premium AI compatibility checks and savings suggestions!</p>
-            <button
-              onClick={() => router.push('/')}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-extrabold shadow-sm transition-all"
-            >
-              Browse Catalog
-            </button>
+          <div className="text-center py-16 px-6 bg-white border border-slate-200/80 rounded-3xl shadow-sm space-y-6">
+            <div className="w-16 h-16 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center mx-auto text-[#3b42c4]">
+              <ShoppingCart className="w-8 h-8" />
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold text-slate-800">Your cart is currently empty</h2>
+              <p className="text-slate-400 text-sm max-w-sm mx-auto">Explore catalog items or use AI assistant prompts to get personalized recommendations!</p>
+            </div>
+            
+            {/* Interactive AI Prompt Chips */}
+            <div className="pt-2 max-w-md mx-auto space-y-2">
+              <span className="text-[10px] font-black uppercase text-indigo-600 tracking-wider flex items-center justify-center gap-1">
+                <Sparkles className="w-3.5 h-3.5" /> AI Recommended Quick Categories
+              </span>
+              <div className="flex flex-wrap justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => router.push('/products?category=laptops')}
+                  className="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-3.5 py-1.5 rounded-full border border-indigo-200/60 transition-colors cursor-pointer"
+                >
+                  💻 Laptops
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/products?category=fragrances')}
+                  className="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-3.5 py-1.5 rounded-full border border-indigo-200/60 transition-colors cursor-pointer"
+                >
+                  ✨ Fragrances
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/products?category=smartphones')}
+                  className="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-3.5 py-1.5 rounded-full border border-indigo-200/60 transition-colors cursor-pointer"
+                >
+                  📱 Smartphones
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                onClick={() => router.push('/products')}
+                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-extrabold shadow-sm transition-all cursor-pointer"
+              >
+                Browse Full Catalog
+              </button>
+            </div>
           </div>
         ) : (
           /* Combined Cart Items & Checkout Dashboard Section */

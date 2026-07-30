@@ -1,5 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { Product } from '@/types';
+import { triggerCartToast } from '@/components/ui/Toast';
 
 export interface AgenticAction {
   type: 'add_to_cart' | 'filter_products' | 'navigate' | 'none';
@@ -86,6 +87,7 @@ export function useAgenticActions() {
           localStorage.setItem('shopilot_cart', JSON.stringify(cartItems));
           // Dispatch events so that layout cart badges recalculate instantly
           window.dispatchEvent(new Event('shopilot_cart_update'));
+          triggerCartToast('Added 1 Item to Cart!');
           return { success: true, message: `Added ${targetProduct.title} to your cart!` };
         }
         return { success: false, message: 'Could not resolve the product to add to cart.' };
