@@ -135,19 +135,18 @@ function AIChatPopup() {
                   </div>
                 )}
                 <div className={`max-w-[78%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1.5`}>
-                  <div className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed font-medium ${
-                    isUser
-                      ? 'text-white rounded-br-sm'
-                      : msg.isError
+                  <div className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed font-medium ${isUser
+                    ? 'text-white rounded-br-sm'
+                    : msg.isError
                       ? 'text-red-300 rounded-bl-sm'
                       : 'text-slate-100 rounded-bl-sm'
-                  }`} style={
-                    isUser
-                      ? { background: 'linear-gradient(135deg,#4f46e5,#6366f1)', border: '1px solid rgba(99,102,241,0.5)' }
-                      : msg.isError
-                      ? { background: 'rgba(220,38,38,0.12)', border: '1px solid rgba(220,38,38,0.25)' }
-                      : { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }
-                  }>
+                    }`} style={
+                      isUser
+                        ? { background: 'linear-gradient(135deg,#4f46e5,#6366f1)', border: '1px solid rgba(99,102,241,0.5)' }
+                        : msg.isError
+                          ? { background: 'rgba(220,38,38,0.12)', border: '1px solid rgba(220,38,38,0.25)' }
+                          : { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }
+                    }>
                     {msg.content}
                   </div>
                   {!isUser && msg.products && msg.products.length > 0 && (
@@ -722,7 +721,7 @@ export default function HomePage() {
       goToTestimonial((displayedTestimonial + 1) % testimonials.length);
     }, 4000);
     return () => clearInterval(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayedTestimonial]);
 
   // Trending Products data
@@ -792,11 +791,11 @@ export default function HomePage() {
       try {
         const cartData = localStorage.getItem('shopilot_cart');
         let cartItems: any[] = cartData ? JSON.parse(cartData) : [];
-        
-        const itemProduct = product || { 
-          id: Date.now(), 
-          title: 'Flash Deal Item', 
-          price: 99.99, 
+
+        const itemProduct = product || {
+          id: Date.now(),
+          title: 'Flash Deal Item',
+          price: 99.99,
           image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
           category: 'General'
         };
@@ -811,11 +810,11 @@ export default function HomePage() {
             variant: 'Standard / Default'
           });
         }
-        
+
         localStorage.setItem('shopilot_cart', JSON.stringify(cartItems));
         window.dispatchEvent(new Event('shopilot_cart_update'));
         triggerCartToast('Added 1 Item to Cart!');
-      } catch (err) {}
+      } catch (err) { }
     });
   };
 
@@ -1477,7 +1476,7 @@ export default function HomePage() {
 
       {/* AI Powered Features Section */}
       <section className="relative overflow-hidden min-h-[600px] flex items-center justify-center bg-slate-950 border-t border-b border-slate-900 py-20">
-        
+
         {/* Background Image Collage Grid */}
         <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-4 gap-2 opacity-25 select-none pointer-events-none">
           <div className="relative h-full w-full">
@@ -1514,14 +1513,14 @@ export default function HomePage() {
               <div key={idx} className="group relative py-6 cursor-pointer border-b border-white/10 last:border-b-0 hover:border-indigo-500/50 transition-all duration-300">
                 <div className="flex flex-col items-start w-full">
                   {/* Vertical Point Title - one line (whitespace-nowrap), italic on hover */}
-                  <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-wider text-white transition-all duration-550 group-hover:text-indigo-400 group-hover:italic whitespace-nowrap">
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-wider text-white transition-all duration-200 ease-out group-hover:text-indigo-400 group-hover:italic whitespace-nowrap">
                     {item.title}
                   </h3>
-                  
+
                   {/* Description - only visible on hover, placed under the heading but aligned to the right side */}
-                  <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-500 ease-in-out w-full">
+                  <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-300 ease-out w-full">
                     <div className="overflow-hidden">
-                      <p className="text-xs sm:text-sm text-indigo-200 leading-relaxed font-semibold transition-all duration-500 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 text-right max-w-xl ml-auto mt-2">
+                      <p className="text-xs sm:text-sm text-indigo-200 leading-relaxed font-semibold transition-all duration-300 ease-out opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 text-right max-w-xl ml-auto mt-2">
                         {item.desc}
                       </p>
                     </div>
@@ -1616,9 +1615,8 @@ export default function HomePage() {
               <button
                 key={idx}
                 onClick={() => goToTestimonial(idx)}
-                className={`h-2.5 rounded-full transition-all duration-300 relative overflow-hidden cursor-pointer ${
-                  displayedTestimonial === idx ? 'w-8 bg-indigo-100' : 'w-2.5 bg-slate-200'
-                }`}
+                className={`h-2.5 rounded-full transition-all duration-300 relative overflow-hidden cursor-pointer ${displayedTestimonial === idx ? 'w-8 bg-indigo-100' : 'w-2.5 bg-slate-200'
+                  }`}
               >
                 {displayedTestimonial === idx && (
                   <div
