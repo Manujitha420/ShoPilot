@@ -33,30 +33,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const checkSession = async () => {
-      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-
-      if (isLocalhost) {
-        const storedToken = localStorage.getItem('shopilot_access_token');
-        if (storedToken) {
-          try {
-            const res = await apiClient.get('/auth/me');
-            if (res.data.success && res.data.user) {
-              const u = res.data.user;
-              const userProfile: UserProfile = {
-                id: u.id,
-                username: u.email,
-                email: u.email,
-                firstName: u.name?.split(' ')[0] || u.name || 'User',
-                lastName: u.name?.split(' ').slice(1).join(' ') || '',
-                gender: 'unspecified',
-                image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name || u.email)}`,
-              };
-              setUser(userProfile);
-              setToken(storedToken);
-              setIsLoading(false);
-              return;
-            }
-          } catch (e) {}
+      const storedToken = localStorage.getItem('shopilot_access_token');
+      if (storedToken) {
+        try {
+          const res = await apiClient.get('/auth/me');
+          if (res.data.success && res.data.user) {
+            const u = res.data.user;
+            const userProfile: UserProfile = {
+              id: u.id,
+              username: u.email,
+              email: u.email,
+              firstName: u.name?.split(' ')[0] || u.name || 'User',
+              lastName: u.name?.split(' ').slice(1).join(' ') || '',
+              gender: 'unspecified',
+              image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name || u.email)}`,
+            };
+            setUser(userProfile);
+            setToken(storedToken);
+            setIsLoading(false);
+            return;
+          }
+        } catch (e) {
+          localStorage.removeItem('shopilot_access_token');
+          localStorage.removeItem('shopilot_refresh_token');
         }
       }
 
@@ -84,16 +83,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     mutationFn: async (credentials: LoginCredentials) => {
       const email = credentials.username || (credentials as any).email;
       const password = credentials.password;
-      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
-      if (isLocalhost) {
-        try {
-          const response = await apiClient.post('/auth/login', { email, password });
-          return { source: 'backend', data: response.data };
-        } catch (backendErr: any) {
-          if (backendErr.response) {
-            throw backendErr;
-          }
+      try {
+        const response = await apiClient.post('/auth/login', { email, password });
+        return { source: 'backend', data: response.data };
+      } catch (backendErr: any) {
+        if (backendErr.response) {
+          throw backendErr;
         }
       }
 
@@ -139,20 +135,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const registerMutation = useMutation({
     mutationFn: async (credentials: RegisterCredentials) => {
       const name = `${credentials.firstName || ''} ${credentials.lastName || ''}`.trim() || credentials.username;
-      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-      
-      if (isLocalhost) {
-        try {
-          const response = await apiClient.post('/auth/register', {
-            email: credentials.email,
-            password: credentials.password,
-            name: name,
-          });
-          return { source: 'backend', data: response.data };
-        } catch (backendErr: any) {
-          if (backendErr.response) {
-            throw backendErr;
-          }
+
+      try {
+        const response = await apiClient.post('/auth/register', {
+          email: credentials.email,
+          password: credentials.password,
+          name: name,
+        });
+        return { source: 'backend', data: response.data };
+      } catch (backendErr: any) {
+        if (backendErr.response) {
+          throw backendErr;
         }
       }
 
