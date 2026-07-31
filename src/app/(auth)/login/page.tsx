@@ -47,10 +47,10 @@ function LoginFormContent() {
 
   const handleFillDemo = (demoUser: 'emilys' | 'michaelw') => {
     if (demoUser === 'emilys') {
-      setUsername('emilys');
+      setUsername('emily.johnson@x.dummyjson.com');
       setPassword('emilyspass');
     } else {
-      setUsername('michaelw');
+      setUsername('michael.williams@x.dummyjson.com');
       setPassword('michaelwpass');
     }
   };
