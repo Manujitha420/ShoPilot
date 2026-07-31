@@ -30,7 +30,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const checkSession = async () => {
-      // 1. Try Express backend /auth/me
       const storedToken = localStorage.getItem('shopilot_access_token');
       if (storedToken) {
         try {
@@ -56,7 +55,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // 2. Fallback to Next.js cookie session
       try {
         const res = await axios.get('/api/auth/me');
         if (res.data.authenticated) {
@@ -82,12 +80,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const email = credentials.username || (credentials as any).email;
       const password = credentials.password;
 
-      // Try Express backend first
       try {
         const response = await apiClient.post('/auth/login', { email, password });
         return { source: 'backend', data: response.data };
-      } catch (backendErr) {
-        // Fallback to Next.js API route
+      } catch (backendErr: any) {
+        if (backendErr.response) {
+          throw backendErr;
+        }
         const response = await axios.post('/api/auth/login', { username: email, password });
         return { source: 'next', data: response.data };
       }
@@ -132,7 +131,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     mutationFn: async (credentials: RegisterCredentials) => {
       const name = `${credentials.firstName || ''} ${credentials.lastName || ''}`.trim() || credentials.username;
       
-      // Try Express backend first
       try {
         const response = await apiClient.post('/auth/register', {
           email: credentials.email,
@@ -140,8 +138,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           name: name,
         });
         return { source: 'backend', data: response.data };
-      } catch (backendErr) {
-        // Fallback to Next.js API route
+      } catch (backendErr: any) {
+        if (backendErr.response) {
+          throw backendErr;
+        }
         const response = await axios.post('/api/auth/register', {
           email: credentials.email,
           password: credentials.password,
