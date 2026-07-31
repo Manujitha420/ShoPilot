@@ -53,6 +53,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setIsLoading(false);
             return;
           }
+        } catch (e) {}
+
+        try {
+          const res = await axios.get('/api/auth/me', {
+            headers: { Authorization: `Bearer ${storedToken}` }
+          });
+          if (res.data.authenticated && res.data.user) {
+            setUser(res.data.user);
+            setToken(storedToken);
+            setIsLoading(false);
+            return;
+          }
         } catch (e) {
           localStorage.removeItem('shopilot_access_token');
           localStorage.removeItem('shopilot_refresh_token');
@@ -61,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       try {
         const res = await axios.get('/api/auth/me');
-        if (res.data.authenticated) {
+        if (res.data.authenticated && res.data.user) {
           setUser(res.data.user);
           setToken('active_session_cookie');
         } else {
@@ -97,28 +109,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { source: 'next', data: response.data };
     },
     onSuccess: ({ source, data }) => {
-      if (source === 'backend') {
-        if (data.accessToken) localStorage.setItem('shopilot_access_token', data.accessToken);
-        if (data.refreshToken) localStorage.setItem('shopilot_refresh_token', data.refreshToken);
+      if (data.accessToken) localStorage.setItem('shopilot_access_token', data.accessToken);
+      if (data.refreshToken) localStorage.setItem('shopilot_refresh_token', data.refreshToken);
 
-        const u = data.user;
-        const userProfile: UserProfile = {
-          id: u.id,
-          username: u.email,
-          email: u.email,
-          firstName: u.name?.split(' ')[0] || u.name || 'User',
-          lastName: u.name?.split(' ').slice(1).join(' ') || '',
-          gender: 'unspecified',
-          image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name || u.email)}`,
-        };
+      const u = data.user;
+      const userProfile: UserProfile = {
+        id: u.id,
+        username: u.email,
+        email: u.email,
+        firstName: u.firstName || u.name?.split(' ')[0] || u.name || 'User',
+        lastName: u.lastName || u.name?.split(' ').slice(1).join(' ') || '',
+        gender: 'unspecified',
+        image: u.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name || u.email)}`,
+      };
 
-        setUser(userProfile);
-        setToken(data.accessToken);
-      } else {
-        setUser(data.user);
-        setToken(data.token || 'active_session_cookie');
-      }
-
+      setUser(userProfile);
+      setToken(data.accessToken || data.token || 'active_session_cookie');
       setError(null);
       queryClient.clear();
     },
@@ -159,28 +165,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { source: 'next', data: response.data };
     },
     onSuccess: ({ source, data }) => {
-      if (source === 'backend') {
-        if (data.accessToken) localStorage.setItem('shopilot_access_token', data.accessToken);
-        if (data.refreshToken) localStorage.setItem('shopilot_refresh_token', data.refreshToken);
+      if (data.accessToken) localStorage.setItem('shopilot_access_token', data.accessToken);
+      if (data.refreshToken) localStorage.setItem('shopilot_refresh_token', data.refreshToken);
 
-        const u = data.user;
-        const userProfile: UserProfile = {
-          id: u.id,
-          username: u.email,
-          email: u.email,
-          firstName: u.name?.split(' ')[0] || u.name || 'User',
-          lastName: u.name?.split(' ').slice(1).join(' ') || '',
-          gender: 'unspecified',
-          image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name || u.email)}`,
-        };
+      const u = data.user;
+      const userProfile: UserProfile = {
+        id: u.id,
+        username: u.email,
+        email: u.email,
+        firstName: u.firstName || u.name?.split(' ')[0] || u.name || 'User',
+        lastName: u.lastName || u.name?.split(' ').slice(1).join(' ') || '',
+        gender: 'unspecified',
+        image: u.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name || u.email)}`,
+      };
 
-        setUser(userProfile);
-        setToken(data.accessToken);
-      } else {
-        setUser(data.user);
-        setToken(data.token || 'active_session_cookie');
-      }
-
+      setUser(userProfile);
+      setToken(data.accessToken || data.token || 'active_session_cookie');
       setError(null);
       queryClient.clear();
     },

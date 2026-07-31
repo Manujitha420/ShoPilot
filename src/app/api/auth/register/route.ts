@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { findUserByEmailOrUsername, registerUserInStore, StoredUser } from '@/lib/userStore';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { prisma } from '@/lib/prisma';
+
+const accessSecret = process.env.JWT_ACCESS_SECRET || 'shopilot_super_secret_access_token_key_2026';
+const refreshSecret = process.env.JWT_REFRESH_SECRET || 'shopilot_super_secret_refresh_token_key_2026';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, password, name, username, firstName, lastName } = body;
+    const { email, password, name, firstName, lastName } = body;
 
     if (!email || !password) {
       return NextResponse.json(
@@ -13,7 +18,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const existingUser = findUserByEmailOrUsername(email);
+    const cleanEmail = email.trim().toLowerCase();
+    const existingUser = await prisma.user.findUnique({ where: { email: cleanEmail } });
     if (existingUser) {
       return NextResponse.json(
         { success: false, message: 'User with this email already exists.' },
@@ -22,47 +28,56 @@ export async function POST(req: NextRequest) {
     }
 
     const fullName = name || `${firstName || ''} ${lastName || ''}`.trim() || 'New User';
-    const computedUsername = username || email.split('@')[0];
-    const id = `usr_${Date.now()}`;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser: StoredUser = {
-      id,
-      email: email.trim().toLowerCase(),
-      name: fullName,
-      username: computedUsername,
-      password,
-      firstName: fullName.split(' ')[0] || fullName,
-      lastName: fullName.split(' ').slice(1).join(' ') || '',
-      gender: 'unspecified',
-      image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(fullName)}`,
-    };
+    const user = await prisma.user.create({
+      data: {
+        email: cleanEmail,
+        password: hashedPassword,
+        name: fullName,
+      },
+    });
 
-    registerUserInStore(newUser);
+    const accessToken = jwt.sign(
+      { id: user.id, email: user.email, name: user.name },
+      accessSecret,
+      { expiresIn: '15m' }
+    );
+    const refreshToken = jwt.sign(
+      { id: user.id, email: user.email },
+      refreshSecret,
+      { expiresIn: '7d' }
+    );
 
-    const token = `token_${id}_${Math.random().toString(36).substring(2)}`;
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await prisma.refreshToken.create({
+      data: { token: refreshToken, userId: user.id, expiresAt },
+    });
 
     const userProfile = {
-      id: newUser.id,
-      email: newUser.email,
-      name: newUser.name,
-      username: newUser.username,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      gender: newUser.gender,
-      image: newUser.image,
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      username: user.email,
+      firstName: user.name.split(' ')[0] || user.name,
+      lastName: user.name.split(' ').slice(1).join(' ') || '',
+      gender: 'unspecified',
+      image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`,
     };
 
     const response = NextResponse.json({
       success: true,
       user: userProfile,
-      token,
-      accessToken: token,
-      refreshToken: `refresh_${token}`,
+      token: accessToken,
+      accessToken,
+      refreshToken,
     });
 
     response.cookies.set({
       name: 'shopilot_token',
-      value: token,
+      value: accessToken,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
