@@ -14,6 +14,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => Promise<void>;
+  clearError: () => void;
   error: string | null;
   isLoggingIn: boolean;
   isRegistering: boolean;
@@ -27,6 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
+
+  const clearError = () => setError(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -210,6 +213,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         register,
         logout,
+        clearError,
         error,
         isLoggingIn: loginMutation.isPending,
         isRegistering: registerMutation.isPending,

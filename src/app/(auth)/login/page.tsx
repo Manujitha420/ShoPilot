@@ -7,7 +7,7 @@ import { User, Eye, EyeOff, AlertCircle, ArrowRight, Loader2 } from 'lucide-reac
 import Link from 'next/link';
 
 function LoginFormContent() {
-  const { login, error, isLoggingIn, isAuthenticated } = useAuth();
+  const { login, error, isLoggingIn, isAuthenticated, clearError } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -18,6 +18,10 @@ function LoginFormContent() {
   const [localError, setLocalError] = useState<string | null>(null);
 
   const redirectPath = searchParams?.get('redirect') || '/';
+
+  useEffect(() => {
+    clearError();
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {

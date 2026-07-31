@@ -7,7 +7,7 @@ import { User, Mail, Lock, AlertCircle, ArrowRight, Loader2 } from 'lucide-react
 import Link from 'next/link';
 
 function RegisterFormContent() {
-  const { register, error, isRegistering, isAuthenticated } = useAuth();
+  const { register, error, isRegistering, isAuthenticated, clearError } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -19,6 +19,10 @@ function RegisterFormContent() {
   const [localError, setLocalError] = useState<string | null>(null);
 
   const redirectPath = searchParams?.get('redirect') || '/';
+
+  useEffect(() => {
+    clearError();
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
