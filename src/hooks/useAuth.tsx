@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { apiClient } from '@/services/api.client';
 import { LoginCredentials, UserProfile, RegisterCredentials } from '@/types';
 
 interface AuthContextType {
@@ -28,13 +28,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    // Check active session via HttpOnly cookie API endpoint
+    // Check active session via Backend API or stored tokens
     const checkSession = async () => {
+      const storedToken = localStorage.getItem('shopilot_access_token');
+      if (!storedToken) {
+        setUser(null);
+        setToken(null);
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        const res = await axios.get('/api/auth/me');
-        if (res.data.authenticated) {
-          setUser(res.data.user);
-          setToken('active_session_cookie');
+        const res = await apiClient.get('/auth/me');
+        if (res.data.success && res.data.user) {
+          const u = res.data.user;
+          const userProfile: UserProfile = {
+            id: u.id,
+            username: u.email,
+            email: u.email,
+            firstName: u.name.split(' ')[0] || u.name,
+            lastName: u.name.split(' ').slice(1).join(' ') || '',
+            gender: 'unspecified',
+            image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name)}`,
+          };
+          setUser(userProfile);
+          setToken(storedToken);
         } else {
           setUser(null);
           setToken(null);
@@ -52,17 +70,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const response = await axios.post('/api/auth/login', credentials);
+      const response = await apiClient.post('/auth/login', {
+        email: credentials.username || (credentials as any).email,
+        password: credentials.password,
+      });
       return response.data;
     },
     onSuccess: (data) => {
-      setUser(data.user);
-      setToken(data.token || 'active_session_cookie');
+      if (data.accessToken) {
+        localStorage.setItem('shopilot_access_token', data.accessToken);
+      }
+      if (data.refreshToken) {
+        localStorage.setItem('shopilot_refresh_token', data.refreshToken);
+      }
+
+      const u = data.user;
+      const userProfile: UserProfile = {
+        id: u.id,
+        username: u.email,
+        email: u.email,
+        firstName: u.name.split(' ')[0] || u.name,
+        lastName: u.name.split(' ').slice(1).join(' ') || '',
+        gender: 'unspecified',
+        image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name)}`,
+      };
+
+      setUser(userProfile);
+      setToken(data.accessToken);
       setError(null);
       queryClient.clear();
     },
     onError: (err: any) => {
-      setError(err.response?.data?.message || 'Invalid username or password.');
+      setError(err.response?.data?.message || 'Invalid email or password.');
     },
   });
 
@@ -73,15 +112,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (credentials: RegisterCredentials) => {
-      const response = await axios.post('/api/auth/login', {
-        username: credentials.username,
+      const name = `${credentials.firstName || ''} ${credentials.lastName || ''}`.trim() || credentials.username;
+      const response = await apiClient.post('/auth/register', {
+        email: credentials.email,
         password: credentials.password,
+        name: name,
       });
       return response.data;
     },
     onSuccess: (data) => {
-      setUser(data.user);
-      setToken(data.token || 'active_session_cookie');
+      if (data.accessToken) {
+        localStorage.setItem('shopilot_access_token', data.accessToken);
+      }
+      if (data.refreshToken) {
+        localStorage.setItem('shopilot_refresh_token', data.refreshToken);
+      }
+
+      const u = data.user;
+      const userProfile: UserProfile = {
+        id: u.id,
+        username: u.email,
+        email: u.email,
+        firstName: u.name.split(' ')[0] || u.name,
+        lastName: u.name.split(' ').slice(1).join(' ') || '',
+        gender: 'unspecified',
+        image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name)}`,
+      };
+
+      setUser(userProfile);
+      setToken(data.accessToken);
       setError(null);
       queryClient.clear();
     },
@@ -96,11 +155,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    try {
-      await axios.post('/api/auth/logout');
-    } catch (e) {
-      console.error('Logout error:', e);
-    }
+    localStorage.removeItem('shopilot_access_token');
+    localStorage.removeItem('shopilot_refresh_token');
     setToken(null);
     setUser(null);
     queryClient.clear();
