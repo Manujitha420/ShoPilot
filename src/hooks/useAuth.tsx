@@ -33,28 +33,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const checkSession = async () => {
-      const storedToken = localStorage.getItem('shopilot_access_token');
-      if (storedToken) {
-        try {
-          const res = await apiClient.get('/auth/me');
-          if (res.data.success && res.data.user) {
-            const u = res.data.user;
-            const userProfile: UserProfile = {
-              id: u.id,
-              username: u.email,
-              email: u.email,
-              firstName: u.name?.split(' ')[0] || u.name || 'User',
-              lastName: u.name?.split(' ').slice(1).join(' ') || '',
-              gender: 'unspecified',
-              image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name || u.email)}`,
-            };
-            setUser(userProfile);
-            setToken(storedToken);
-            setIsLoading(false);
-            return;
-          }
-        } catch (e) {
-          // Fall through to Next.js cookie check
+      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+
+      if (isLocalhost) {
+        const storedToken = localStorage.getItem('shopilot_access_token');
+        if (storedToken) {
+          try {
+            const res = await apiClient.get('/auth/me');
+            if (res.data.success && res.data.user) {
+              const u = res.data.user;
+              const userProfile: UserProfile = {
+                id: u.id,
+                username: u.email,
+                email: u.email,
+                firstName: u.name?.split(' ')[0] || u.name || 'User',
+                lastName: u.name?.split(' ').slice(1).join(' ') || '',
+                gender: 'unspecified',
+                image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name || u.email)}`,
+              };
+              setUser(userProfile);
+              setToken(storedToken);
+              setIsLoading(false);
+              return;
+            }
+          } catch (e) {}
         }
       }
 
@@ -82,17 +84,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     mutationFn: async (credentials: LoginCredentials) => {
       const email = credentials.username || (credentials as any).email;
       const password = credentials.password;
+      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
-      try {
-        const response = await apiClient.post('/auth/login', { email, password });
-        return { source: 'backend', data: response.data };
-      } catch (backendErr: any) {
-        if (backendErr.response) {
-          throw backendErr;
+      if (isLocalhost) {
+        try {
+          const response = await apiClient.post('/auth/login', { email, password });
+          return { source: 'backend', data: response.data };
+        } catch (backendErr: any) {
+          if (backendErr.response) {
+            throw backendErr;
+          }
         }
-        const response = await axios.post('/api/auth/login', { username: email, password });
-        return { source: 'next', data: response.data };
       }
+
+      const response = await axios.post('/api/auth/login', { username: email, password });
+      return { source: 'next', data: response.data };
     },
     onSuccess: ({ source, data }) => {
       if (source === 'backend') {
@@ -121,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       queryClient.clear();
     },
     onError: (err: any) => {
-      setError(err.response?.data?.message || 'Invalid email or password.');
+      setError(err.response?.data?.message || err.message || 'Invalid email or password.');
     },
   });
 
@@ -133,27 +139,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const registerMutation = useMutation({
     mutationFn: async (credentials: RegisterCredentials) => {
       const name = `${credentials.firstName || ''} ${credentials.lastName || ''}`.trim() || credentials.username;
+      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
       
-      try {
-        const response = await apiClient.post('/auth/register', {
-          email: credentials.email,
-          password: credentials.password,
-          name: name,
-        });
-        return { source: 'backend', data: response.data };
-      } catch (backendErr: any) {
-        if (backendErr.response) {
-          throw backendErr;
+      if (isLocalhost) {
+        try {
+          const response = await apiClient.post('/auth/register', {
+            email: credentials.email,
+            password: credentials.password,
+            name: name,
+          });
+          return { source: 'backend', data: response.data };
+        } catch (backendErr: any) {
+          if (backendErr.response) {
+            throw backendErr;
+          }
         }
-        const response = await axios.post('/api/auth/register', {
-          email: credentials.email,
-          password: credentials.password,
-          name: name,
-          firstName: credentials.firstName,
-          lastName: credentials.lastName,
-        });
-        return { source: 'next', data: response.data };
       }
+
+      const response = await axios.post('/api/auth/register', {
+        email: credentials.email,
+        password: credentials.password,
+        name: name,
+        firstName: credentials.firstName,
+        lastName: credentials.lastName,
+      });
+      return { source: 'next', data: response.data };
     },
     onSuccess: ({ source, data }) => {
       if (source === 'backend') {
@@ -182,7 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       queryClient.clear();
     },
     onError: (err: any) => {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setError(err.response?.data?.message || err.message || 'Registration failed. Please try again.');
     },
   });
 
